@@ -13,19 +13,22 @@ class windows(ctk.CTk):  # main class inherits from tkinter window class
         self.geometry('500x500')
         ctk.set_default_color_theme('dark-blue')
 
-        self.bind('<Configure>', self.updatebg)
+        self.bind('<Configure>', lambda e: self.configurescreen())
 
-        self.bgimage = ctk.CTkImage(light_image=Image.open('MainProject\Background.png'), 
-                               dark_image=Image.open('MainProject\Background.png'),
-                               size=(self.winfo_width()*2.5, self.winfo_height()*2.5))
-        self.mylabel = ctk.CTkLabel(self,
-                                text='',
-                                image=self.bgimage, 
-                                width=self.winfo_width()*2.5, 
-                                height=self.winfo_height()*2.5,)
+        self.bgimage = ctk.CTkImage(
+            light_image=Image.open('Background.png'), 
+            dark_image=Image.open('Background.png'),
+            size=(self.winfo_width(), self.winfo_height())
+        )
+        
+        self.mylabel = ctk.CTkLabel(
+            self,
+            text='',
+            image=self.bgimage, 
+            width=self.winfo_width(), 
+            height=self.winfo_height()
+        )
         self.mylabel.place(relx=0, rely=0)
-
-        print(self.winfo_height())
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -46,21 +49,22 @@ class windows(ctk.CTk):  # main class inherits from tkinter window class
         frame = self.frames[cont]
         frame.tkraise()
     
-    def updatebg(self):
-        self.newbgimage = ctk.CTkImage(
-            light_image=Image.open('MainProject\Background.png'), 
-            dark_image=Image.open('MainProject\Background.png'),
-            size=(self.winfo_width()*2.5, self.winfo_height()*2.5)
+    def configurescreen(self):
+        self.minsize(
+            width=max(self.frames[i].winfo_height() for i in self.frames),
+            height=max(self.frames[i].winfo_height() for i in self.frames)
+        )
+
+        self.bgimage.configure(
+            size=(self.winfo_width(), self.winfo_height())
             )
 
         self.mylabel.configure(
-            require_redraw=True, 
-            width=self.winfo_width()*2.5, 
-            height=self.winfo_height()*2.5, 
-            image=self.newbgimage
+            width=self.winfo_width(), 
+            height=self.winfo_height(), 
+            image=self.bgimage
             )
-        self.mylabel.place(relx=0.5, rely=0.5, anchor='center')
-        print(self.winfo_width())
+        self.mylabel.place(relx=0, rely=0, anchor='nw')
 
 
 class LoginPage(ctk.CTkFrame):  # first frame which is shown: main login screen
@@ -75,7 +79,7 @@ class LoginPage(ctk.CTkFrame):  # first frame which is shown: main login screen
             placeholder_text='Username', 
             corner_radius=16,
             font=windows.font1
-            )
+        )
         self.username.grid(row=0, column=0, sticky='we', padx=5, pady=5)
 
         self.password = ctk.CTkEntry(
@@ -84,7 +88,7 @@ class LoginPage(ctk.CTkFrame):  # first frame which is shown: main login screen
             show='*',  
             corner_radius=16,
             font=windows.font1
-            )
+        )
         self.password.grid(row=1, column=0, sticky='we', padx=5, pady=5)
 
         login_button = ctk.CTkButton(
@@ -92,7 +96,7 @@ class LoginPage(ctk.CTkFrame):  # first frame which is shown: main login screen
             text='Login', 
             command=self.login,
             font=windows.font1
-            )
+        )
         login_button.grid(row=2, column=0, sticky='we', padx=5, pady=5)
 
         new_account = ctk.CTkLabel(
@@ -101,7 +105,7 @@ class LoginPage(ctk.CTkFrame):  # first frame which is shown: main login screen
             font=windows.font2,
             cursor='hand2',
             text_color='blue',
-            )
+        )
         new_account.grid(row=4, column=0, padx=5)
         new_account.bind('<Button-1>', lambda e: self.parent.show_frame(NewAccount))
 
