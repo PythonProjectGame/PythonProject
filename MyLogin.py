@@ -1,7 +1,9 @@
+from CTkMessagebox import CTkMessagebox
 import customtkinter as ctk
 import bcrypt
 import mysql.connector
 from PIL import Image
+import MyVal
 
 # main class inherits from tkinter window class
 class windows(ctk.CTk):
@@ -22,8 +24,8 @@ class windows(ctk.CTk):
 
         # uploads an image for the background
         self.bgimage = ctk.CTkImage(
-            light_image=Image.open('Background.png'), 
-            dark_image=Image.open('Background.png'),
+            light_image=Image.open('background.png'),
+            dark_image=Image.open('background.png'),
             size=(self.winfo_width(), self.winfo_height())
         )
         
@@ -125,8 +127,39 @@ class LoginPage(ctk.CTkFrame):
         new_account.grid(row=4, column=0, padx=5)
         new_account.bind('<Button-1>', lambda e: self.parent.show_frame(NewAccount))
 
-    # runs the sql data base to check login credentials
+    # runs the sql data base to check login credentials with validation
     def login(self):
+        # checks if a username and password have been entered
+        if not MyVal.present(self.username.get())\
+            or not MyVal.present(self.password.get()):
+            self.clear()
+            CTkMessagebox(
+                title="Error", 
+                message="Please enter a username and password!", 
+                icon="cancel"
+            )
+            return
+        
+        # checks if the usernanme is in a valid range
+        if not MyVal.length(self.username.get(), (4, 15), 4):
+            self.clear()
+            CTkMessagebox(
+                title="Error", 
+                message="Username is not in the correct range!", 
+                icon="cancel"
+            )
+            return
+
+        # checks the password is larger than the min length 
+        if not MyVal.length(self.password.get(), 6, 3):
+            self.clear()
+            CTkMessagebox(
+                title="Error", 
+                message="Password is too short!", 
+                icon="cancel"
+            )
+            return
+
         mydb = mysql.connector.connect(
             host='localhost',
             user='root',
@@ -136,10 +169,16 @@ class LoginPage(ctk.CTkFrame):
         mycursor = mydb.cursor()  # cursor used to run sql quiries
         mycursor.execute(f'select Salt from Userdata where Username = \'{self.username.get()}\'')
 
+        # trys to fetch and encode the salt for the password
         try:
             salt = mycursor.fetchone()[0].encode()
         except TypeError:
             self.clear()
+            CTkMessagebox(
+                title="Error", 
+                message="Invalid username or password!", 
+                icon="cancel"
+            )
             return
 
         # returns values for which username and password are correct
@@ -150,6 +189,11 @@ class LoginPage(ctk.CTkFrame):
         if mycursor.fetchall():
             self.parent.show_frame(LoggedIn)  # shows logged in page
         else:
+            CTkMessagebox(
+                title="Error", 
+                message="Invalid username or password!", 
+                icon="cancel"
+            )
             self.clear()
 
         mydb.close()
