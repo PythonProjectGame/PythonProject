@@ -42,5 +42,4 @@ def email(value: str) -> bool:
     if emailpattern.match(value):
         return True
     else:
-        return False
-        #
+        return False#
