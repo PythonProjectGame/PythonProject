@@ -43,5 +43,3 @@ def email(value: str) -> bool:
         return True
     else:
         return False
-
-        #yay
