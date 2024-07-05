@@ -1,44 +1,23 @@
-from CTkMessagebox import CTkMessagebox
-import customtkinter as ctk
-import bcrypt
-import mysql.connector
-from PIL import Image
+from tkinter import messagebox
+import tkinter as tk
 import MyVal
+import pickle
+import socket
 
 
 # main class inherits from tkinter window class
-class windows(ctk.CTk):
+class windows(tk.Tk):
     # constant fonts for buttons and lables
-    font1 = ("garamond", 15)
-    font2 = ("garamond", 10)
 
     def __init__(self, *args, **kwargs):
-        ctk.CTk.__init__(self, *args, **kwargs)
+        tk.Tk.__init__(self, *args, **kwargs)
 
         # initial setup of screen
         self.wm_title("Main Project")
         self.geometry("500x500")
-        ctk.set_default_color_theme("dark-blue")
 
-        # runs self.configurescreen each time the screen size changes
-        self.bind("<Configure>", lambda e: self.configurescreen())
-
-        # uploads an image for the background
-        self.bgimage = ctk.CTkImage(
-            light_image=Image.open("background.png"),
-            dark_image=Image.open("background.png"),
-            size=(self.winfo_width(), self.winfo_height()),
-        )
-
-        # creates a labek which holds the background image
-        self.mylabel = ctk.CTkLabel(
-            self,
-            text="",
-            image=self.bgimage,
-            width=self.winfo_width(),
-            height=self.winfo_height(),
-        )
-        self.mylabel.grid(row=0, column=0, rowspan=3, columnspan=3, sticky="nsew")
+        # setting background
+        self.config(bg="#2e9e80")
 
         # weights the first and third columns and rows to centre the frames
         self.grid_columnconfigure(0, weight=1)
@@ -49,7 +28,7 @@ class windows(ctk.CTk):
         # creates a dictionary of frames via classes
         self.frames = {}
         for F in (LoginPage, LoggedIn, NewAccount):
-            frame = F(self, fg_color="#FFFFFF", bg_color="#FFFFFF")
+            frame = F(self)
 
             self.frames[F] = frame
             frame.grid(row=1, column=1, sticky="nsew")
@@ -57,165 +36,147 @@ class windows(ctk.CTk):
         # shows loginpage
         self.show_frame(LoginPage)
 
-    # function to raise a frame to the top so that it is visible
-    def show_frame(self, cont):
-        frame = self.frames[cont]
-        frame.tkraise()
-
-    # function which resizes the bg
-    def configurescreen(self):
         # sets minimum size of the window to the biggest frame
         self.minsize(
             width=max(self.frames[i].winfo_height() for i in self.frames),
             height=max(self.frames[i].winfo_height() for i in self.frames),
         )
 
-        self.bgimage.configure(size=(self.winfo_width(), self.winfo_height()))
+    # function to raise a frame to the top so that it is visible
+    def show_frame(self, cont):
+        frame = self.frames[cont]
+        frame.tkraise()
 
 
 # first frame which is shown: main login screen
-class LoginPage(ctk.CTkFrame):
-    def __init__(self, parent, *args, **kwargs):
+class LoginPage(tk.Frame):
+    def __init__(self, parent: object, *args, **kwargs) -> None:
         self.parent = parent
 
         # initialises frame
-        ctk.CTkFrame.__init__(self, self.parent, *args, **kwargs)
+        tk.Frame.__init__(self, self.parent, *args, **kwargs)
 
         # binds the return key to the login function
         self.parent.bind("<Return>", lambda e: self.login())
 
         # entries for username and password with login button
-        self.username = ctk.CTkEntry(
-            self, placeholder_text="Username", corner_radius=16, font=windows.font1
-        )
+        self.uservar = tk.StringVar(value="Username")
+        self.username = tk.Entry(self, textvariable=self.uservar)
         self.username.grid(row=0, column=0, sticky="we", padx=5, pady=5)
+        self.username.bind("<FocusIn>", lambda e: self.on_click(1))
+        self.username.bind("<FocusOut>", lambda e: self.focus_out(1))
 
-        self.password = ctk.CTkEntry(
-            self,
-            placeholder_text="Password",
-            show="*",
-            corner_radius=16,
-            font=windows.font1,
-        )
+        self.passvar = tk.StringVar(value="Password")
+        self.password = tk.Entry(self, textvariable=self.passvar)
         self.password.grid(row=1, column=0, sticky="we", padx=5, pady=5)
+        self.password.bind("<FocusIn>", lambda e: self.on_click(2))
+        self.password.bind("<FocusOut>", lambda e: self.focus_out(2))
 
-        login_button = ctk.CTkButton(
-            self, text="Login", command=self.login, font=windows.font1
-        )
+        login_button = tk.Button(self, text="Login", command=self.login)
         login_button.grid(row=2, column=0, sticky="we", padx=5, pady=5)
 
         # links a label to the new account page
-        new_account = ctk.CTkLabel(
-            self,
-            text="New to MainProject?\nApply for a New Account",
-            font=windows.font2,
-            cursor="hand2",
-            text_color="blue",
+        new_account = tk.Label(
+            self, text="New to MainProject?\nApply for a New Account", cursor="hand2"
         )
+        new_account.config(font=("Arial", 2, "bold"))
         new_account.grid(row=4, column=0, padx=5)
         new_account.bind("<Button-1>", lambda e: self.parent.show_frame(NewAccount))
 
-    # runs the sql data base to check login credentials with validation
-    def login(self):
-        # checks if a username and password have been entered
-        if not MyVal.present(self.username.get()) or not MyVal.present(
-            self.password.get()
-        ):
-            self.clear()
-            CTkMessagebox(
-                title="Error",
-                message="Please enter a username and password!",
-                icon="cancel",
-            )
-            return
-
-        # checks if the usernanme is in a valid range
-        if not MyVal.length(self.username.get(), (4, 15), 4):
-            self.clear()
-            CTkMessagebox(
-                title="Error",
-                message="Username is not in the correct range!",
-                icon="cancel",
-            )
-            return
-
-        # checks the password is larger than the min length
-        if not MyVal.length(self.password.get(), 6, 3):
-            self.clear()
-            CTkMessagebox(
-                title="Error", message="Password is too short!", icon="cancel"
-            )
-            return
-
-        mydb = mysql.connector.connect(
-            host="localhost", user="root", password="Skyla1234", database="mydatabase"
-        )
-        mycursor = mydb.cursor()  # cursor used to run sql quiries
-        mycursor.execute(
-            f"select Salt from Userdata where Username = '{self.username.get()}'"
-        )
-
-        # trys to fetch and encode the salt for the password
-        try:
-            salt = mycursor.fetchone()[0].encode()
-        except TypeError:
-            self.clear()
-            CTkMessagebox(
-                title="Error", message="Invalid username or password!", icon="cancel"
-            )
-            return
-
-        # returns values for which username and password are correct
-        mycursor.execute(f"select * from UserData\
-                 where Username='{self.username.get()}' \
-                 and Password='{bcrypt.hashpw(self.password.get().encode(), salt).decode()}'")
-
-        if mycursor.fetchall():
-            self.parent.show_frame(LoggedIn)  # shows logged in page
-        else:
-            CTkMessagebox(
-                title="Error", message="Invalid username or password!", icon="cancel"
-            )
-            self.clear()
-
-        mydb.close()
-
-    def clear(self):
+    def clear(self) -> None:
         self.username.delete(0, "end")
-        self.username.configure(placeholder_text="Username")
         self.password.delete(0, "end")
-        self.password.configure(placeholder_text="Password")
+
+    def on_click(self, entry: int) -> None:
+        match entry:
+            case 1:
+                if self.uservar.get() == "Username":
+                    self.uservar.set("")
+            case 2:
+                if self.passvar.get() == "Password":
+                    self.passvar.set("")
+                    self.password.config(show="*")
+
+    def focus_out(self, entry: int) -> None:
+        match entry:
+            case 1:
+                if self.uservar.get() == "":
+                    self.uservar.set("Username")
+            case 2:
+                if self.passvar.get() == "":
+                    self.passvar.set("Password")
+                    self.password.config(show="")
+
+    # runs the sql data base to check login credentials with validation
+    def login(self) -> None:
+        pswd = self.passvar.get()
+        user = self.uservar.get()
+
+        if all([user == "Username", pswd == "Password"]):
+            user = ""
+            pswd = ""
+
+        if all([MyVal.present(user), MyVal.present(pswd)]):
+            pass
+        else:
+            messagebox.showwarning(
+                title="Warning", message="Please enter a Username and Password"
+            )
+            return
+
+        if all([MyVal.length(user, (4, 10), 4), MyVal.length(pswd, (6, 12), 4)]):
+            pass
+        else:
+            messagebox.showwarning(
+                title="Warning", message="Username or Password are of an invalid length"
+            )
+            self.clear()
+            return
+
+        try:
+            host = "127.0.0.1"
+            port = 5555
+
+            login = socket.socket()
+            login.connect((host, port))
+
+            data = ["Login", self.username.get(), self.password.get()]
+            data = pickle.dumps(data)
+            login.send(data)
+
+            indata = login.recv(1024)
+            indata = pickle.loads(indata)
+            print(indata)
+
+            # login.close()
+
+        except ConnectionRefusedError:
+            messagebox.showwarning(
+                title="Warning", message="Server is down, please try again later"
+            )
 
 
-class LoggedIn(ctk.CTkFrame):
+class LoggedIn(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         self.parent = parent
-        ctk.CTkFrame.__init__(self, self.parent)
+        tk.Frame.__init__(self, self.parent)
 
 
-class NewAccount(ctk.CTkFrame):
+class NewAccount(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         self.parent = parent
-        ctk.CTkFrame.__init__(self, self.parent)
+        tk.Frame.__init__(self, self.parent)
 
-        self.newemail = ctk.CTkEntry(
-            self, placeholder_text="Email", font=windows.font1, corner_radius=16
-        )
+        self.newemail = tk.Entry(self)
         self.newemail.grid(row=0, column=0, padx=5, pady=5)
 
-        self.newusername = ctk.CTkEntry(
-            self, placeholder_text="Username", font=windows.font1, corner_radius=16
-        )
+        self.newusername = tk.Entry(self)
         self.newusername.grid(row=1, column=0, padx=5, pady=5)
 
-        self.newpassword = ctk.CTkEntry(
-            self, placeholder_text="Password", font=windows.font1, corner_radius=16
-        )
+        self.newpassword = tk.Entry(self)
         self.newpassword.grid(row=2, column=0, padx=5, pady=5)
 
-        self.apply = ctk.CTkButton(
-            self, corner_radius=16, text="Apply", font=windows.font1
-        )
+        self.apply = tk.Button(self, text="Apply")
         self.apply.grid(row=4, column=0, padx=5, pady=5)
 
 

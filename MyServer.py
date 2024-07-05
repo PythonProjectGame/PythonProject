@@ -1,57 +1,54 @@
-import socket
-from _thread import *  # noqa: F403
-from MyPlayer import Player
 import pickle
+import socket
+import sqlite3
+import bcrypt
 
-server = "10.2.5.71"
+host = "127.0.0.1"
+
 port = 5555
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket()
+s.bind((host, port))
 
-try:
-    s.bind((server, port))
-except socket.error as e:
-    str(e)
+s.listen(10)
 
-s.listen(2)
-print("Waiting for a connection, Server Started")
+c, address = s.accept()
+print(f"connected to {address}")
 
 
-players = [Player(0, 0, 50, 50, (255, 0, 0)), Player(100, 100, 50, 50, (0, 0, 255))]
+def sql(data: list) -> bool:
+    type = data[0]
+    match type:
+        case "Login":
+            conn = sqlite3.connect("GameData.db")
+            cursor = conn.cursor()
 
+            username, password = tuple(data[1:])
 
-def threaded_client(conn, player):
-    conn.send(pickle.dumps(players[player]))
-    reply = ""
-    while True:
-        try:
-            data = pickle.loads(conn.recv(2048))
-            players[player] = data
-
-            if not data:
-                print("Disconnected")
-                break
+            cursor.execute(f"select Password from Login where Username='{username}'")
+            pswd = cursor.fetchall()[0][0]
+            password = bcrypt.hashpw(password.encode(), pswd)
+            if password == pswd:
+                cursor.execute(f"select UserID from Login where Username='{username}'")
+                return True
             else:
-                if player == 1:
-                    reply = players[0]
-                else:
-                    reply = players[1]
-
-                print("Received: ", data)
-                print("Sending : ", reply)
-
-            conn.sendall(pickle.dumps(reply))
-        except:  # noqa: E722
-            break
-
-    print("Lost connection")
-    conn.close()
+                return False
+                
+            conn.close()
 
 
-currentPlayer = 0
 while True:
-    conn, addr = s.accept()
-    print("Connected to:", addr)
+    data = c.recv(1024)
 
-    start_new_thread(threaded_client, (conn, currentPlayer))  # noqa: F405
-    currentPlayer += 1
+    if not data:
+        break
+
+    data = pickle.loads(data)
+
+    print(f"recieved {data}")
+
+    print(sql(data))
+
+    c.send(pickle.dumps(sql(data)))
+
+c.close()

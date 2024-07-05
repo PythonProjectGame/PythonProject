@@ -1,26 +1,12 @@
 import bcrypt
 import sqlite3
+import MyVal
 
 conn = sqlite3.connect("GameData.db")
-
-mycursor = conn.cursor()
-
-username = input()
-pswd = input()
-mycursor.execute(f'select Salt from Login where Username="{username}"')
-usersalt = mycursor.fetchall()[0][0]
-mycursor.execute(
-    "select UserID from Login where Password=?",
-    (bcrypt.hashpw(pswd.encode(), usersalt),),
-)
-print(mycursor.fetchall())
-
-print(bcrypt.hashpw(pswd.encode(), usersalt))
-
+cursor = conn.cursor()
 
 """ 
-column names: (Username text, Password text, Email text, Admin integer, Salt text
-
+pswd = 'BaseLogin'
 Useful commands
 show DATABASE,
 create table TABLENAME (CULUMNNAME COLMNVARIABLETYPE(),),
