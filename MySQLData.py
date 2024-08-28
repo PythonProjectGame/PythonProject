@@ -5,6 +5,8 @@ import MyVal
 conn = sqlite3.connect("GameData.db")
 cursor = conn.cursor()
 
+
+
 """ 
 pswd = 'BaseLogin'
 Useful commands

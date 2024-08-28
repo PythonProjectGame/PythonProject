@@ -3,6 +3,7 @@ import socket
 import sqlite3
 import bcrypt
 
+
 host = "127.0.0.1"
 
 port = 5555
@@ -25,15 +26,14 @@ def sql(data: list) -> bool:
 
             username, password = tuple(data[1:])
 
-            cursor.execute(f"select Password from Login where Username='{username}'")
+            cursor.execute(f"select Password from LoginData where Username='{username}'")
             pswd = cursor.fetchall()[0][0]
             password = bcrypt.hashpw(password.encode(), pswd)
             if password == pswd:
-                cursor.execute(f"select UserID from Login where Username='{username}'")
                 return True
             else:
                 return False
-                
+
             conn.close()
 
 
