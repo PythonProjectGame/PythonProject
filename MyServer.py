@@ -28,9 +28,13 @@ def sql(data: list) -> bool:
             username, password = tuple(data[1:])
 
             cursor.execute(f"select Password from LoginData where Username='{username}'")
-            pswd = cursor.fetchall()[0][0]
-            password = bcrypt.hashpw(password.encode(), pswd)
-            if password == pswd:
+            try:
+                pswd = cursor.fetchall()[0][0]
+            except IndexError:
+                return "False"
+
+            # password = bcrypt.checkpw(password, pswd)
+            if bcrypt.checkpw(password.encode(), pswd):
                 cursor.execute(f"select AccessRight from LoginData where Username='{username}'")
                 access = cursor.fetchall()[0][0]
                 if access == "Admin":
@@ -56,7 +60,7 @@ def threaded_client(conn):
         if data == "exit":
             break
 
-        print(sql(data))
+        # print(sql(data))
 
         conn.send(pickle.dumps(sql(data)))
 
@@ -64,6 +68,6 @@ while True:
     c, address = s.accept()
     print(f"connected to {address}")
 
-    _thread.start_new_thread(threaded_client, (c))
+    _thread.start_new_thread(threaded_client, (c,))
 
 c.close()

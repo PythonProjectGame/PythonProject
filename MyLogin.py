@@ -153,6 +153,12 @@ class LoginPage(tk.Frame):
             messagebox.showwarning(
                 title="Warning", message="Server is down, please try again later"
             )
+        
+        if indata == "False":
+            messagebox.showwarning(
+                title="Warning", message="Access Denied"
+            )
+            return
 
 
 class LoggedIn(tk.Frame):
