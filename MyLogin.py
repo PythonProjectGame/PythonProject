@@ -1,6 +1,5 @@
 from tkinter import messagebox
 import tkinter as tk
-from tkinter import ttk
 import MyVal
 import pickle
 import socket
@@ -85,8 +84,8 @@ class LoginPage(tk.Frame):
         new_account.bind("<Button-1>", lambda e: self.parent.show_frame(NewAccount))
 
     def clear(self) -> None:
-        self.username.delete(0, "end")
-        self.password.delete(0, "end")
+        self.uservar.set("")
+        self.passcar.set("")
 
     def on_click(self, entry: int) -> None:
         match entry:
@@ -107,13 +106,12 @@ class LoginPage(tk.Frame):
                 if self.passvar.get() == "":
                     self.passvar.set("Password")
                     self.password.config(show="")
-
     # runs the sql data base to check login credentials with validation
     def login(self) -> None:
         pswd = self.passvar.get()
         user = self.uservar.get()
 
-        if all([user == "Username", pswd == "Password"]):
+        if any([user == "Username", pswd == "Password"]):
             user = ""
             pswd = ""
 
@@ -149,7 +147,7 @@ class LoginPage(tk.Frame):
             indata = pickle.loads(indata)
             print(indata)
 
-            # login.close()
+            login.close()
 
         except ConnectionRefusedError:
             messagebox.showwarning(
@@ -168,17 +166,86 @@ class NewAccount(tk.Frame):
         self.parent = parent
         tk.Frame.__init__(self, self.parent)
 
-        self.newemail = tk.Entry(self)
-        self.newemail.grid(row=0, column=0, padx=5, pady=5)
+        self.firstvar = tk.StringVar(value="FirstName")
+        self.firstname= tk.Entry(self, textvariable=self.firstvar)
+        self.firstname.grid(row=0, column=0, padx=5, pady=5)
+        self.firstname.bind("<FocusIn>", lambda e: self.on_click(1))
+        self.firstname.bind("<FocusOut>", lambda e: self.focus_out(1))
 
-        self.newusername = tk.Entry(self)
-        self.newusername.grid(row=1, column=0, padx=5, pady=5)
+        self.lastvar = tk.StringVar(value="LastName")
+        self.lastname = tk.Entry(self, textvariable=self.lastvar)
+        self.lastname.grid(row=1, column=0, padx=5, pady=5)
+        self.lastname.bind("<FocusIn>", lambda e: self.on_click(2))
+        self.lastname.bind("<FocusOut>", lambda e: self.focus_out(2))
 
-        self.newpassword = tk.Entry(self)
-        self.newpassword.grid(row=2, column=0, padx=5, pady=5)
+        self.emailvar = tk.StringVar(value="Email")
+        self.newemail = tk.Entry(self, textvariable=self.emailvar)
+        self.newemail.grid(row=3, column=0, padx=5, pady=5)
+        self.newemail.bind("<FocusIn>", lambda e: self.on_click(3))
+        self.newemail.bind("<FocusOut>", lambda e: self.focus_out(3))
 
-        self.apply = tk.Button(self, text="Apply")
+        self.apply = tk.Button(self, text="Apply", command=self.apply)
         self.apply.grid(row=4, column=0, padx=5, pady=5)
+    
+    def on_click(self, entry: int) -> None:
+        match entry:
+            case 1:
+                if self.firstvar.get() == "FirstName":
+                    self.firstvar.set("")
+            case 2:
+                if self.lastvar.get() == "LastName":
+                    self.lastvar.set("")
+            case 3:
+                if self.emailvar.get() == "Email":
+                    self.emailvar.set("")
+
+    def focus_out(self, entry: int) -> None:
+        match entry:
+            case 1:
+                if self.firstvar.get() == "":
+                    self.firstvar.set("FirstName")
+            case 2:
+                if self.lastvar.get() == "":
+                    self.lastvar.set("LastName")
+            case 3:
+                if self.emailvar.get() == "":
+                    self.emailvar.set("Email")
+
+    def apply(self) -> None:
+        firstname = self.firstvar.get()
+        lastname = self.lastvar.get()
+        email = self.emailvar.get()
+
+        if any([firstname == "FirstName", lastname == "Lastname", email == "Email",]):
+            firstname = ""
+            lastname = ""
+            email = ""
+        
+        if all([MyVal.present(firstname), MyVal.present(lastname), MyVal.present(email)]):
+            pass
+        else:
+            messagebox.showwarning(
+                title="Warning", message="Please fill in all entries"
+            )
+            return
+        
+        if all([MyVal.length(firstname, (2, 12), 4), MyVal.length(lastname, (2, 12), 4)]):
+            pass
+        else:
+            messagebox.showwarning(
+                title="Warning", message="Please enter names of apropriate length"
+            )
+            self.clear()
+            return
+        
+        if MyVal.email(email):
+            pass
+        else:
+            messagebox.showwarning(
+                title="Warning", message="Please enter a valid email"
+            )
+            
+
 
 
 a = windows()

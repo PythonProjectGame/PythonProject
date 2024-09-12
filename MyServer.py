@@ -2,20 +2,21 @@ import pickle
 import socket
 import sqlite3
 import bcrypt
+import _thread
 
 
 host = "127.0.0.1"
 
 port = 5555
 
-s = socket.socket()
-s.bind((host, port))
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+try:
+    s.bind((host, port))
+except socket.error as e:
+    str(e)
 
 s.listen(10)
-
-c, address = s.accept()
-print(f"connected to {address}")
-
 
 def sql(data: list) -> bool:
     type = data[0]
@@ -30,25 +31,39 @@ def sql(data: list) -> bool:
             pswd = cursor.fetchall()[0][0]
             password = bcrypt.hashpw(password.encode(), pswd)
             if password == pswd:
-                return True
+                cursor.execute(f"select AccessRight from LoginData where Username='{username}'")
+                access = cursor.fetchall()[0][0]
+                if access == "Admin":
+                    return "Admin"
+                else:
+                    return "Client"
             else:
-                return False
+                return "False"
 
             conn.close()
 
+def threaded_client(conn):
+    while True:
+        data = conn.recv(1024)
+
+        if not data:
+            continue
+
+        data = pickle.loads(data)
+
+        print(f"recieved {data}")
+
+        if data == "exit":
+            break
+
+        print(sql(data))
+
+        conn.send(pickle.dumps(sql(data)))
 
 while True:
-    data = c.recv(1024)
+    c, address = s.accept()
+    print(f"connected to {address}")
 
-    if not data:
-        break
-
-    data = pickle.loads(data)
-
-    print(f"recieved {data}")
-
-    print(sql(data))
-
-    c.send(pickle.dumps(sql(data)))
+    _thread.start_new_thread(threaded_client, (c))
 
 c.close()
