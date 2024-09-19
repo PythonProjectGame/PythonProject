@@ -1,15 +1,16 @@
 from tkinter import messagebox
 import tkinter as tk
+import network
 import MyVal
-import pickle
-import socket
+import pickle  # noqa: F401
+import socket  # noqa: F401
 
 
 # main class inherits from tkinter window class
 class windows(tk.Tk):
     # constant fonts for buttons and lables
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         tk.Tk.__init__(self, *args, **kwargs)
 
         # initial setup of screen
@@ -18,6 +19,12 @@ class windows(tk.Tk):
 
         # setting background
         self.config(bg="#2e9e80")
+
+        self.adjust = tk.Frame(self)
+        self.adjust.grid(row=0, column=3, sticky="ne")
+
+        exit = tk.Button(self.adjust, text="X", command=quit)
+        exit.grid(row=0, column=3)
 
         # weights the first and third columns and rows to centre the frames
         self.grid_columnconfigure(0, weight=1)
@@ -43,7 +50,7 @@ class windows(tk.Tk):
         )
 
     # function to raise a frame to the top so that it is visible
-    def show_frame(self, cont):
+    def show_frame(self, cont) -> None:
         frame = self.frames[cont]
         frame.tkraise()
 
@@ -56,8 +63,6 @@ class LoginPage(tk.Frame):
         # initialises frame
         tk.Frame.__init__(self, self.parent, *args, **kwargs)
 
-        # binds the return key to the login function
-        self.parent.bind("<Return>", lambda e: self.login())
 
         # entries for username and password with login button
         self.uservar = tk.StringVar(value="Username")
@@ -79,7 +84,7 @@ class LoginPage(tk.Frame):
         new_account = tk.Label(
             self, text="New to MainProject?\nApply for a New Account", cursor="hand2"
         )
-        new_account.config(font=("Arial", 2, "bold"))
+        new_account.config(font=("Arial", 2))
         new_account.grid(row=4, column=0, padx=5)
         new_account.bind("<Button-1>", lambda e: self.parent.show_frame(NewAccount))
 
@@ -133,18 +138,12 @@ class LoginPage(tk.Frame):
             return
 
         try:
-            host = "127.0.0.1"
-            port = 5555
-
-            login = socket.socket()
-            login.connect((host, port))
+            login = network.Network()
 
             data = ["Login", self.username.get(), self.password.get()]
-            data = pickle.dumps(data)
-            login.send(data)
+            
+            indata = login.send(data)
 
-            indata = login.recv(1024)
-            indata = pickle.loads(indata)
             print(indata)
 
             login.close()
@@ -154,6 +153,10 @@ class LoginPage(tk.Frame):
                 title="Warning", message="Server is down, please try again later"
             )
         
+        if indata == "True":
+            self.parent.destroy()
+        if indata == "Admin":
+            self.parent.destroy()
         if indata == "False":
             messagebox.showwarning(
                 title="Warning", message="Access Denied"
@@ -162,13 +165,13 @@ class LoginPage(tk.Frame):
 
 
 class LoggedIn(tk.Frame):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs) -> None:
         self.parent = parent
         tk.Frame.__init__(self, self.parent)
 
 
 class NewAccount(tk.Frame):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs) -> None:
         self.parent = parent
         tk.Frame.__init__(self, self.parent)
 
@@ -250,9 +253,6 @@ class NewAccount(tk.Frame):
             messagebox.showwarning(
                 title="Warning", message="Please enter a valid email"
             )
-            
-
-
 
 a = windows()
 a.mainloop()

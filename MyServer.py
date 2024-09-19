@@ -60,8 +60,6 @@ def threaded_client(conn):
         if data == "exit":
             break
 
-        # print(sql(data))
-
         conn.send(pickle.dumps(sql(data)))
 
 while True:
