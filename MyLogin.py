@@ -1,6 +1,6 @@
 from tkinter import messagebox
 import tkinter as tk
-import network
+import MyNetwork
 import MyVal
 import pickle  # noqa: F401
 import socket  # noqa: F401
@@ -138,7 +138,7 @@ class LoginPage(tk.Frame):
             return
 
         try:
-            login = network.Network()
+            login = MyNetwork.Network()
 
             data = ["Login", self.username.get(), self.password.get()]
             

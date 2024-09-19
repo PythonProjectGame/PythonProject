@@ -1,26 +1,31 @@
 import socket
 import pickle
-import pygame
-
-pygame.init()
 
 
-host = "127.0.0.1"
-port = 5555
+class Network:
+    def __init__(self):
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server = "127.0.0.1"
+        self.port = 5555
+        self.addr = (self.server, self.port)
+        self.p = self.connect()
 
-client_socket = socket.socket()
+    def getP(self):
+        return self.p
 
-client_socket.connect((host, port))
-data = input()
+    def connect(self) -> bool:
+        try:
+            self.client.connect(self.addr)
+            return True
+        except:  # noqa: E722
+            pass
 
-
-while data != "bye":
-    data = pickle.dumps(data)
-    client_socket.send(data)
-    indata = client_socket.recv(1024)
-    indata = pickle.loads(indata)
-    print(indata)
-    data = input()
-
-
-client_socket.close()
+    def send(self, data):
+        try:
+            self.client.send(pickle.dumps(data))
+            return pickle.loads(self.client.recv(2048))
+        except socket.error as e:
+            print(e)
+    
+    def close(self) -> None:
+        self.client.send(pickle.dumps("exit"))

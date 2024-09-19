@@ -18,7 +18,15 @@ except socket.error as e:
 
 s.listen(10)
 
-def sql(data: list) -> bool:
+def sql(data: list) -> str:
+    """_summary_
+
+    Args:
+        data (list): A list of values imputed from the server to make requests to the sql database
+
+    Returns:
+        str: The type of login required or the values from the game data
+    """
     type = data[0]
     match type:
         case "Login":
@@ -47,6 +55,11 @@ def sql(data: list) -> bool:
             conn.close()
 
 def threaded_client(conn):
+    """_summary_
+
+    Args:
+        conn: The address and port connection to the client
+    """
     while True:
         data = conn.recv(1024)
 
