@@ -18,14 +18,17 @@ class Network:
             self.client.connect(self.addr)
             return True
         except:  # noqa: E722
-            pass
+            return False
 
     def send(self, data):
         try:
             self.client.send(pickle.dumps(data))
             return pickle.loads(self.client.recv(2048))
         except socket.error as e:
-            print(e)
-    
+            raise e
+
     def close(self) -> None:
-        self.client.send(pickle.dumps("exit"))
+        try:
+            self.client.send(pickle.dumps("exit"))
+        except:  # noqa: E722
+            pass

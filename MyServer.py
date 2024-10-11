@@ -16,9 +16,10 @@ try:
 except socket.error as e:
     str(e)
 
-s.listen(10)
+s.listen()
 
-def sql(data: list) -> str:
+
+def inputData(data: list) -> any:
     """_summary_
 
     Args:
@@ -35,15 +36,18 @@ def sql(data: list) -> str:
 
             username, password = tuple(data[1:])
 
-            cursor.execute(f"select Password from LoginData where Username='{username}'")
+            cursor.execute(
+                f"select Password from LoginData where Username='{username}'"
+            )
             try:
                 pswd = cursor.fetchall()[0][0]
             except IndexError:
                 return "False"
 
-            # password = bcrypt.checkpw(password, pswd)
             if bcrypt.checkpw(password.encode(), pswd):
-                cursor.execute(f"select AccessRight from LoginData where Username='{username}'")
+                cursor.execute(
+                    f"select AccessRight from LoginData where Username='{username}'"
+                )
                 access = cursor.fetchall()[0][0]
                 if access == "Admin":
                     return "Admin"
@@ -53,6 +57,10 @@ def sql(data: list) -> str:
                 return "False"
 
             conn.close()
+
+        case "Game":
+            x, y = tuple(data[1:])
+
 
 def threaded_client(conn):
     """_summary_
@@ -73,12 +81,14 @@ def threaded_client(conn):
         if data == "exit":
             break
 
-        conn.send(pickle.dumps(sql(data)))
+        conn.send(pickle.dumps(inputData(data)))
 
-while True:
-    c, address = s.accept()
-    print(f"connected to {address}")
 
-    _thread.start_new_thread(threaded_client, (c,))
+if __name__ == "__main__":
+    while True:
+        c, address = s.accept()
+        print(f"connected to {address}")
 
-c.close()
+        _thread.start_new_thread(threaded_client, (c,))
+
+    c.close()

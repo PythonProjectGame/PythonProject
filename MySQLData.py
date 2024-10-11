@@ -1,11 +1,8 @@
 import bcrypt
 import sqlite3
-import MyVal
 
 conn = sqlite3.connect("GameData.db")
 cursor = conn.cursor()
-
-
 
 """ 
 pswd = 'BaseLogin'

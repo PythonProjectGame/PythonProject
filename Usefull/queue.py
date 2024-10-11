@@ -10,7 +10,7 @@ class queue:
             self.__data.push()
 
     def is_full(self) -> bool:
-        if self.__head == self.__tail-1:
+        if self.__head == self.__tail - 1:
             return True
         else:
             return False
@@ -33,7 +33,7 @@ class queue:
                 self.__tail = -1
             self.__data[self.__tail] = ""
 
-    def push(self, data:any) -> None:
+    def push(self, data: any) -> None:
         if self.is_full():
             return
         else:
@@ -41,12 +41,3 @@ class queue:
             if self.__head == self.__length:
                 self.__head = -1
             self.__data[self.__head] = data
-
-game = queue(2)
-
-game.push("COD")
-game.push("warframe")
-game.pop()
-game.push("hello")
-game.pop()
-print(game.peek())

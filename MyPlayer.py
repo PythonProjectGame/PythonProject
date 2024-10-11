@@ -1,14 +1,17 @@
 import pygame
 
-class Player():
-    def __init__(self, x, y, width, height, color):
-        self.x = x
-        self.y = y
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, color, width, height):
+        super().__init__()
         self.width = width
         self.height = height
-        self.color = color
-        self.rect = (x,y,width,height)
+        self.image = pygame.Surface([width, height])
+        self.image.fill("White")
+        self.image.set_colorkey("Blue")
         self.vel = 3
+        pygame.draw.rect(self.image, color, pygame.Rect(0, 0, width, height))
+        self.rect = self.image.get_rect()
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, self.rect)
@@ -17,18 +20,20 @@ class Player():
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT]:
-            self.x -= self.vel
+            self.rect.left -= self.vel
 
         if keys[pygame.K_RIGHT]:
-            self.x += self.vel
+            self.rect.right += self.vel
 
         if keys[pygame.K_UP]:
-            self.y -= self.vel
+            self.rect.top -= self.vel
 
         if keys[pygame.K_DOWN]:
-            self.y += self.vel
+            self.rect.bottom += self.vel
+
+        if keys[pygame.K_LSHIFT]:
+            self.vel = 1
+        else:
+            self.vel = 3
 
         self.update()
-
-    def update(self):
-        self.rect = (self.x, self.y, self.width, self.height)

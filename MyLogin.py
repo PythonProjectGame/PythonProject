@@ -2,9 +2,8 @@ from tkinter import messagebox
 import tkinter as tk
 import MyNetwork
 import MyVal
-import pickle  # noqa: F401
-import socket  # noqa: F401
-
+import _thread  # noqa: F401
+import Usefull.FancyPrint  # noqa: F401
 
 # main class inherits from tkinter window class
 class windows(tk.Tk):
@@ -25,6 +24,11 @@ class windows(tk.Tk):
 
         exit = tk.Button(self.adjust, text="X", command=quit)
         exit.grid(row=0, column=3)
+
+        back = tk.Button(
+            self.adjust, text="Back", command=lambda: self.show_frame(LoginPage)
+        )
+        back.grid(row=0, column=2)
 
         # weights the first and third columns and rows to centre the frames
         self.grid_columnconfigure(0, weight=1)
@@ -63,7 +67,6 @@ class LoginPage(tk.Frame):
         # initialises frame
         tk.Frame.__init__(self, self.parent, *args, **kwargs)
 
-
         # entries for username and password with login button
         self.uservar = tk.StringVar(value="Username")
         self.username = tk.Entry(self, textvariable=self.uservar)
@@ -84,13 +87,21 @@ class LoginPage(tk.Frame):
         new_account = tk.Label(
             self, text="New to MainProject?\nApply for a New Account", cursor="hand2"
         )
-        new_account.config(font=("Arial", 2))
+        new_account.config(fg="blue", font=("Arial", 8, "italic"))
         new_account.grid(row=4, column=0, padx=5)
         new_account.bind("<Button-1>", lambda e: self.parent.show_frame(NewAccount))
 
+        # _thread.start_new_thread(
+        #     lambda: Usefull.FancyPrint.Print(
+        #         "New to MainProject?/Apply for a New Account", parent, new_account
+        #     ),
+        #     ()
+        # )
+
     def clear(self) -> None:
-        self.uservar.set("")
-        self.passcar.set("")
+        self.uservar.set("Username")
+        self.passvar.set("Password")
+        self.password.config(show="")
 
     def on_click(self, entry: int) -> None:
         match entry:
@@ -111,10 +122,12 @@ class LoginPage(tk.Frame):
                 if self.passvar.get() == "":
                     self.passvar.set("Password")
                     self.password.config(show="")
+
     # runs the sql data base to check login credentials with validation
     def login(self) -> None:
         pswd = self.passvar.get()
         user = self.uservar.get()
+        indata = "False"
 
         if any([user == "Username", pswd == "Password"]):
             user = ""
@@ -126,6 +139,7 @@ class LoginPage(tk.Frame):
             messagebox.showwarning(
                 title="Warning", message="Please enter a Username and Password"
             )
+            self.clear()
             return
 
         if all([MyVal.length(user, (4, 10), 4), MyVal.length(pswd, (6, 12), 4)]):
@@ -141,27 +155,26 @@ class LoginPage(tk.Frame):
             login = MyNetwork.Network()
 
             data = ["Login", self.username.get(), self.password.get()]
-            
+
             indata = login.send(data)
 
             print(indata)
 
             login.close()
 
-        except ConnectionRefusedError:
+            if indata == "True":
+                self.parent.destroy()
+            if indata == "Admin":
+                self.parent.destroy()
+            if indata == "False":
+                messagebox.showwarning(title="Warning", message="Access Denied")
+            return
+
+        except BrokenPipeError:
             messagebox.showwarning(
                 title="Warning", message="Server is down, please try again later"
             )
-        
-        if indata == "True":
-            self.parent.destroy()
-        if indata == "Admin":
-            self.parent.destroy()
-        if indata == "False":
-            messagebox.showwarning(
-                title="Warning", message="Access Denied"
-            )
-            return
+            self.clear()
 
 
 class LoggedIn(tk.Frame):
@@ -176,7 +189,7 @@ class NewAccount(tk.Frame):
         tk.Frame.__init__(self, self.parent)
 
         self.firstvar = tk.StringVar(value="FirstName")
-        self.firstname= tk.Entry(self, textvariable=self.firstvar)
+        self.firstname = tk.Entry(self, textvariable=self.firstvar)
         self.firstname.grid(row=0, column=0, padx=5, pady=5)
         self.firstname.bind("<FocusIn>", lambda e: self.on_click(1))
         self.firstname.bind("<FocusOut>", lambda e: self.focus_out(1))
@@ -195,7 +208,7 @@ class NewAccount(tk.Frame):
 
         self.apply = tk.Button(self, text="Apply", command=self.apply)
         self.apply.grid(row=4, column=0, padx=5, pady=5)
-    
+
     def on_click(self, entry: int) -> None:
         match entry:
             case 1:
@@ -225,20 +238,30 @@ class NewAccount(tk.Frame):
         lastname = self.lastvar.get()
         email = self.emailvar.get()
 
-        if any([firstname == "FirstName", lastname == "Lastname", email == "Email",]):
+        if any(
+            [
+                firstname == "FirstName",
+                lastname == "Lastname",
+                email == "Email",
+            ]
+        ):
             firstname = ""
             lastname = ""
             email = ""
-        
-        if all([MyVal.present(firstname), MyVal.present(lastname), MyVal.present(email)]):
+
+        if all(
+            [MyVal.present(firstname), MyVal.present(lastname), MyVal.present(email)]
+        ):
             pass
         else:
             messagebox.showwarning(
                 title="Warning", message="Please fill in all entries"
             )
             return
-        
-        if all([MyVal.length(firstname, (2, 12), 4), MyVal.length(lastname, (2, 12), 4)]):
+
+        if all(
+            [MyVal.length(firstname, (2, 12), 4), MyVal.length(lastname, (2, 12), 4)]
+        ):
             pass
         else:
             messagebox.showwarning(
@@ -246,7 +269,7 @@ class NewAccount(tk.Frame):
             )
             self.clear()
             return
-        
+
         if MyVal.email(email):
             pass
         else:
@@ -254,5 +277,7 @@ class NewAccount(tk.Frame):
                 title="Warning", message="Please enter a valid email"
             )
 
-a = windows()
-a.mainloop()
+
+if __name__ == "__main__":
+    a = windows()
+    a.mainloop()
