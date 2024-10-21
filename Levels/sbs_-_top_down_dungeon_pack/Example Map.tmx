@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="12" height="12" tilewidth="64" tileheight="64" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="Tiles/Floors/Tiled Tsx/Floor-Stone_01-64x64.tsx"/>
+ <tileset firstgid="49" source="Tiles/Walls/Tiled Tsx/Wall-Concrete_01-64x64.tsx"/>
+ <tileset firstgid="97" source="Tiles/Walls/Tiled Tsx/Wall-Brick_01-64x64.tsx"/>
+ <tileset firstgid="145" source="Tiles/Walls/Tiled Tsx/Wall-Glass_01-64x64.tsx"/>
+ <tileset firstgid="193" source="Tiles/Floors/Tiled Tsx/Floor-Grass_01-64x64.tsx"/>
+ <tileset firstgid="241" source="Tiles/Floors/Tiled Tsx/Floor-Dirt_01-64x64.tsx"/>
+ <tileset firstgid="289" source="Tiles/Walls/Tiled Tsx/Wall-Dirt_01-64x64.tsx"/>
+ <tileset firstgid="337" source="Tiles/Walls/Tiled Tsx/Wall-Glass_02-64x64.tsx"/>
+ <tileset firstgid="385" source="Tiles/Floors/Tiled Tsx/Floor-Stone_02-64x64.tsx"/>
+ <tileset firstgid="433" source="Tiles/Floors/Tiled Tsx/Floor-Stone_03-64x64.tsx"/>
+ <tileset firstgid="481" source="Tiles/Floors/Tiled Tsx/Floor-Dirt_02-64x64.tsx"/>
+ <tileset firstgid="529" source="Tiles/Walls/Tiled Tsx/Wall-Metal_01-64x64.tsx"/>
+ <tileset firstgid="577" source="Tiles/Floors/Tiled Tsx/Floor-Metal_01-64x64.tsx"/>
+ <tileset firstgid="625" source="Tiles/Floors/Tiled Tsx/Floor-Sand_01-64x64.tsx"/>
+ <tileset firstgid="673" source="Tiles/Floors/Tiled Tsx/Floor-Sand_02-64x64.tsx"/>
+ <tileset firstgid="721" source="Tiles/Floors/Tiled Tsx/Floor-Glass_01-64x64.tsx"/>
+ <tileset firstgid="769" source="Tiles/Walls/Tiled Tsx/Wall-Brick_02-64x64.tsx"/>
+ <tileset firstgid="817" source="Tiles/Walls/Tiled Tsx/Wall-Brick_03-64x64.tsx"/>
+ <tileset firstgid="865" source="Tiles/Walls/Tiled Tsx/Wall-Stone_01-64x64.tsx"/>
+ <tileset firstgid="913" source="Tiles/Walls/Tiled Tsx/Wall-Sand_01-64x64.tsx"/>
+ <layer id="2" name="Floors" width="12" height="12">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,400,416,0,0,496,512,0,0,688,704,0,
+0,408,424,0,0,504,520,0,0,696,712,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,208,224,0,0,736,752,0,0,592,608,0,
+0,216,232,0,0,744,760,0,0,600,616,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,640,656,0,0,448,464,0,0,16,32,0,
+0,648,664,0,0,456,472,0,0,24,40,0,
+0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="1" name="Walls" width="12" height="12">
+  <data encoding="csv">
+97,107,107,98,49,59,59,50,145,155,155,146,
+99,0,0,99,51,0,0,51,147,0,0,147,
+99,0,0,99,51,0,0,51,147,0,0,147,
+105,107,107,106,57,59,59,58,153,155,155,154,
+289,299,299,290,337,347,347,338,529,539,539,530,
+291,0,0,291,339,0,0,339,531,0,0,531,
+291,0,0,291,339,0,0,339,531,0,0,531,
+297,299,299,298,345,347,347,346,537,539,539,538,
+913,923,923,914,817,827,827,818,769,779,779,770,
+915,0,0,915,819,0,0,819,771,0,0,771,
+915,0,0,915,819,0,0,819,771,0,0,771,
+921,923,923,922,825,827,827,826,777,779,779,778
+</data>
+ </layer>
+</map>
