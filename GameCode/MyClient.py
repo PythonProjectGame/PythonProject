@@ -1,5 +1,7 @@
 import pygame
 import sys
+# sys.path.append("../PythonProject")
+# import MyNetwork
 from pytmx.util_pygame import load_pygame
 from pygame.math import Vector2 as vector  # noqa: F401
 from MyLevel import Level
@@ -24,7 +26,7 @@ class Game:
 
     def run(self) -> None:
         while True:
-            dt = self.clock.tick(60) / 1000
+            dt = self.clock.tick() / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
