@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
 
         self.groups = groups
 
-        self.image = pygame.Surface((TILE_SIZE-2, TILE_SIZE-2))
+        self.image = pygame.Surface((TILE_SIZE - 2, TILE_SIZE - 2))
         self.image.fill("red")
 
         # Rects
@@ -64,7 +64,7 @@ class Player(pygame.sprite.Sprite):
             self.jump = True
 
         if keys[pygame.K_LSHIFT]:
-            self.speed = 10
+            self.speed = 100
         else:
             self.speed = 300
 
@@ -72,7 +72,6 @@ class Player(pygame.sprite.Sprite):
             self.timers["fire rate"].activate()
             bullet = Bullet(
                 (self.rect.centerx, self.rect.centery),
-                "Surf",
                 (self.groups),
                 self.collision_sprites,
             )

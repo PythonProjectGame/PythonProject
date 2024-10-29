@@ -1,7 +1,7 @@
 import pygame
 import sys  # noqa: F401
 from pygame.math import Vector2 as vector  # noqa: F401
-from MySprites import Sprite
+from MySprites import Sprite, MovingSprite
 from MyPlayer import Player
 from GameSettings import TILE_SIZE
 
@@ -21,8 +21,7 @@ class Level:
         for x, y, surf in tmx_map.get_layer_by_name("Terain").tiles():
             Sprite(
                 (x * TILE_SIZE, y * TILE_SIZE),
-                surf,
-                (self.all_sprites, self.collision_sprites),
+                groups=(self.all_sprites, self.collision_sprites),
             )
 
         # Objects
@@ -36,14 +35,14 @@ class Level:
                 # Calculating movement direction
                 if obj.width > obj.height:  # Horizontal
                     move_dir = "x"
-                    start_pos = (obj.x, obj.y + obj.height / 2)
-                    end_pos = (obj.x + obj.width, obj.y + obj.height / 2)
+                    start_pos = ((obj.x)/2, (obj.y + obj.height / 2)/2)
+                    end_pos = ((obj.x + obj.width)/2, (obj.y + obj.height / 2)/2)
                 else:  # Vertical
                     move_dir = "y"
-                    start_pos = (obj.x + obj.width / 2, obj.y)
-                    end_pos = (obj.x + obj.width / 2, obj.y + obj.height)
+                    start_pos = ((obj.x + obj.width / 2)/2, (obj.y)/2)
+                    end_pos = ((obj.x + obj.width / 2)/2, (obj.y + obj.height)/2)
                 speed = obj.properties["speed"]
-                print(speed)
+                MovingSprite((self.all_sprites, self.collision_sprites), start_pos, end_pos, move_dir, speed)
 
     def run(self, dt):
         self.all_sprites.update(dt)
