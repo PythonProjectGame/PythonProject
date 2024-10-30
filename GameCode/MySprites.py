@@ -25,11 +25,15 @@ class MovingSprite(Sprite):
     def __init__(self, groups, start_pos, end_pos, move_dir, speed):
         surf = pygame.Surface((TILE_SIZE * 4, TILE_SIZE))
         super().__init__(start_pos, surf, groups)
-        self.rect.center = start_pos
+        if move_dir == "x":
+            self.rect.midleft = start_pos
+        else:
+            self.rect.midtop = start_pos
         self.start_pos = start_pos
         self.end_pos = end_pos
 
         # Movement
+        self.moving = True
         self.speed = speed
         self.move_dir = move_dir
         self.direction = vector(1, 0) if move_dir == "x" else vector(0, 1)
@@ -70,7 +74,7 @@ class Bullet(pygame.sprite.Sprite):
 
         self.direction_vector = vector(0, 0)
 
-        self.speed = 500
+        self.speed = 1000
 
     def direction(self, start: [int, int]):
         x, y = pygame.mouse.get_pos()
