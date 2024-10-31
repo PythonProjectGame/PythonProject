@@ -35,7 +35,7 @@ class Level:
                     case "BG":
                         z = Z_LAYERS["bg tiles"]
                     case "FG":
-                        z = Z_LAYERS["fg"]
+                        z = Z_LAYERS["bg tiles"]
                     case _:
                         z = Z_LAYERS["main"]
 

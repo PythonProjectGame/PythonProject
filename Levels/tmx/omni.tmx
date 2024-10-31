@@ -461,7 +461,7 @@
   <object id="30" name="palm_large" gid="636" x="1654.33" y="930.667" width="78" height="136"/>
   <object id="31" name="palm_bg" gid="633" x="1654.67" y="930.667" width="128" height="128"/>
  </objectgroup>
- <objectgroup id="7" name="BG Details" visible="0">
+ <objectgroup id="7" name="BG Details">
   <object id="34" name="static" gid="644" x="2766" y="867" width="52" height="178"/>
   <object id="35" name="static" gid="645" x="3074" y="859" width="52" height="178"/>
   <object id="36" name="static" gid="643" x="2987" y="930" width="42" height="32"/>
