@@ -8,7 +8,7 @@ from pygame.math import Vector2 as vector  # noqa: F401
 from os.path import join
 from MyLevel import Level
 from GameSettings import WIN_WIDTH, WIN_HEIGHT
-from MySupport import import_folder, import_sub_folders
+from MySupport import import_folder, import_sub_folders, import_image
 
 class Game:
     def __init__(self):
@@ -28,13 +28,20 @@ class Game:
         self.level_frames = {
             "helicopter": import_folder("Levels", "Graphics", "Level", "helicopter"),
             "saw": import_folder("Levels", "Enemies", "saw", "animation"),
+            "saw_chain": import_image("Levels", "Enemies", "saw", "saw_chain"),
             "floor_spike": import_folder("Levels", "Enemies", "floor_spike"),
             "palms": import_sub_folders("Levels", "Graphics", "Level","palms"),
             "big_chain": import_folder("Levels", "Graphics", "Level", "BG", "big_chain"),
             "small_chain": import_folder("Levels", "Graphics", "Level", "BG", "small_chain"),
             "candle": import_folder("Levels", "Graphics", "Level", "BG", "candle"),
             "candle_light": import_folder("Levels", "Graphics", "Level", "BG", "candle_light"),
-            "player": import_sub_folders("Levels", "Graphics", "Player")
+            "player": import_sub_folders("Levels", "Graphics", "Player"),
+            "spike": import_image("Levels", "Enemies", "ball_spike", "spiked ball"),
+            "spike_chain": import_image("Levels", "Enemies", "ball_spike", "spiked chain"),
+            "tooth": import_folder("Levels", "Enemies", "Tooth", "run"),
+            "shell": import_sub_folders("Levels", "Enemies", "Shell"),
+            "pearl": import_image("Levels", "Enemies", "pearl", "pearl"),
+            "items": import_sub_folders("Levels", "Graphics", "Items")
         }
 
     def run(self) -> None:

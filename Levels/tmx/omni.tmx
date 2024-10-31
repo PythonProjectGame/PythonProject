@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="74">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="87">
  <tileset firstgid="1" source="../tilesets/Outside.tsx"/>
  <tileset firstgid="193" source="../tilesets/Grass.tsx"/>
  <tileset firstgid="213" source="../tilesets/Platforms.tsx"/>
@@ -433,12 +433,50 @@
    <properties>
     <property name="flip" type="bool" value="false"/>
     <property name="platform" type="bool" value="true"/>
-    <property name="speed" type="int" value="30"/>
+    <property name="speed" type="int" value="100"/>
+   </properties>
+  </object>
+  <object id="75" name="saw" x="2709" y="555" width="456" height="12">
+   <properties>
+    <property name="flip" type="bool" value="false"/>
+    <property name="platform" type="bool" value="false"/>
+    <property name="speed" type="int" value="80"/>
+   </properties>
+  </object>
+  <object id="74" name="spike" gid="651" x="1173" y="681" width="54" height="54">
+   <properties>
+    <property name="end_angle" type="int" value="180"/>
+    <property name="platform" type="bool" value="false"/>
+    <property name="radius" type="int" value="100"/>
+    <property name="speed" type="int" value="50"/>
+    <property name="start_angle" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="77" name="saw" x="1544" y="588" width="16" height="328">
+   <properties>
+    <property name="flip" type="bool" value="false"/>
+    <property name="platform" type="bool" value="false"/>
+    <property name="speed" type="int" value="80"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="12" name="Enemies">
+  <object id="82" name="tooth" gid="654" x="2048" y="768" width="48" height="46"/>
+  <object id="86" name="tooth" gid="654" x="2368" y="928" width="48" height="46"/>
+  <object id="83" name="tooth" gid="654" x="1312.67" y="705.333" width="48" height="46"/>
+  <object id="84" name="shell" gid="652" x="480" y="928" width="76" height="46">
+   <properties>
+    <property name="reverse" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="85" name="shell" gid="2147484300" x="352" y="928" width="76" height="46">
+   <properties>
+    <property name="reverse" type="bool" value="true"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="2" name="Objects">
-  <object id="4" name="Player" x="32" y="864" width="64" height="64"/>
+  <object id="4" name="Player" x="32.5" y="861.5" width="64" height="64"/>
   <object id="17" name="barrel" gid="629" x="1250.12" y="929.409" width="46" height="50"/>
   <object id="18" name="crate" gid="630" x="1278.91" y="929.561" width="50" height="36"/>
   <object id="19" name="barrel" gid="629" x="1287.09" y="895.758" width="46" height="50"/>
@@ -452,7 +490,7 @@
     <property name="inverted" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="21" name="saw" gid="632" x="1515.33" y="820.667" width="76" height="76"/>
+  <object id="21" name="saw" gid="632" x="2585.33" y="772.667" width="76" height="76"/>
   <object id="25" name="palm_bg_left" gid="634" x="1869.33" y="901" width="104" height="106"/>
   <object id="26" name="palm_bg_right" gid="635" x="2197.33" y="830.333" width="104" height="106"/>
   <object id="27" name="palm_right" gid="638" x="2153.33" y="803.667" width="128" height="106"/>

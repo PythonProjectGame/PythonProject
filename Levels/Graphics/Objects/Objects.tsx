@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.0" name="Objects" tilewidth="128" tileheight="178" tilecount="22" columns="0">
+<tileset version="1.10" tiledversion="1.11.0" name="Objects" tilewidth="128" tileheight="178" tilecount="25" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image source="barrel.png" width="46" height="50"/>
@@ -66,5 +66,14 @@
  </tile>
  <tile id="21">
   <image source="../Level/BG/small_chain/01.png.png" width="16" height="62"/>
+ </tile>
+ <tile id="22">
+  <image source="../../Enemies/ball_spike/spiked ball.png" width="54" height="54"/>
+ </tile>
+ <tile id="23">
+  <image source="../../Enemies/Shell/idle/0.png" width="76" height="46"/>
+ </tile>
+ <tile id="25">
+  <image source="../../Enemies/Tooth/run/4.png" width="48" height="46"/>
  </tile>
 </tileset>
