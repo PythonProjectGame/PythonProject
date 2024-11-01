@@ -1,14 +1,13 @@
 import pygame
 import sys
-
-# sys.path.append("../PythonProject")
-# import MyNetwork
 from pytmx.util_pygame import load_pygame
-from pygame.math import Vector2 as vector  # noqa: F401
 from os.path import join
 from MyLevel import Level
 from GameSettings import WIN_WIDTH, WIN_HEIGHT
-from MySupport import import_folder, import_sub_folders, import_image
+from MySupport import import_folder, import_sub_folders, import_image, import_folder_dict
+from GameData import Data
+from Debug import debug  # Noqa: F401
+from MyUi import UI
 
 class Game:
     def __init__(self):
@@ -19,10 +18,11 @@ class Game:
         pygame.display.set_caption("Sound Assassin")
         self.clock = pygame.time.Clock()
         self.importAssets()
-
+        
+        self.ui = UI(self.font, self.ui_frames)
+        self.data = Data(self.ui)        
         self.tmx_maps = {0: load_pygame(join("Levels", "tmx", "omni.tmx"))}
-
-        self.cur_stage = Level(self.tmx_maps[0], self.level_frames)
+        self.cur_stage = Level(self.tmx_maps[0], self.level_frames, self.data)
     
     def importAssets(self):
         self.level_frames = {
@@ -41,7 +41,18 @@ class Game:
             "tooth": import_folder("Levels", "Enemies", "Tooth", "run"),
             "shell": import_sub_folders("Levels", "Enemies", "Shell"),
             "pearl": import_image("Levels", "Enemies", "pearl", "pearl"),
-            "items": import_sub_folders("Levels", "Graphics", "Items")
+            "items": import_sub_folders("Levels", "Graphics", "Items"),
+            "particle": import_folder("Levels", "Graphics", "particle"),
+            "flag": import_folder("Levels", "Graphics", "Level", "flag"),
+            "bg_tiles": import_folder_dict("Levels", "Graphics", "Level", "BG", "Tiles"),
+            "cloud_large": import_image("Levels", "Graphics", "Level", "BG", "Sky", "large_cloud"),
+            "cloud_small": import_folder("Levels", "Graphics", "Level", "BG", "Sky", "small_couds"),
+            
+        }
+        self.font = pygame.font.Font(join("Levels", "Graphics", "UI", "runescape_uf.ttf"), 40)
+        self.ui_frames = {
+            "heart": import_folder("Levels", "Graphics", "UI", "heart"),
+            "coin": import_image("Levels", "Graphics", "UI", "coin")
         }
 
     def run(self) -> None:
@@ -53,6 +64,9 @@ class Game:
                     sys.exit()
 
             self.cur_stage.run(dt)
+            self.ui.update(dt)
+            # debug(self.data.health)
+            # debug(self.data.coins, 10, 50)
             pygame.display.update()
 
 

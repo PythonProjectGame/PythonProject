@@ -1,8 +1,7 @@
 import pygame
-import sys  # noqa: F401
 from pygame.math import Vector2 as vector
 from pygame.transform import flip
-from os.path import join  # noqa: F401
+from math import sin
 from GameSettings import TILE_SIZE, Z_LAYERS, ANIMATION_SPEED
 from MyTimer import Timer
 
@@ -16,10 +15,12 @@ class Player(pygame.sprite.Sprite):
         collision_sprites: [pygame.sprite.Sprite],
         semicollision_sprites: [pygame.sprite.Sprite],
         frames,
+        data
     ) -> None:
         # General Setup
         super().__init__(groups)
         self.z = Z_LAYERS["main"]
+        self.data = data
 
         # Image
         self.frames, self.frame_index = frames, 0
@@ -53,6 +54,7 @@ class Player(pygame.sprite.Sprite):
             "wall slide block": Timer(250),
             "platform skip": Timer(100),
             "attack block": Timer(500),
+            "hit": Timer(400),
         }
 
     def input(self):
@@ -71,7 +73,7 @@ class Player(pygame.sprite.Sprite):
             if keys[pygame.K_DOWN] | keys[pygame.K_s]:
                 self.timers["platform skip"].activate()
             
-            if keys[pygame.K_x]:
+            if keys[pygame.K_w]:
                 self.attack()
             self.direction.x = (
                 input_vector.normalize().x if input_vector.x else input_vector.x
@@ -262,6 +264,18 @@ class Player(pygame.sprite.Sprite):
                 else:
                     self.state = "jump" if self.direction.y < 0 else "fall"
 
+    def getDamage(self):
+        if not self.timers["hit"].active:
+            self.data.health -= 1
+            self.timers["hit"].activate()
+    
+    def flicker(self):
+        if self.timers["hit"].active and sin(pygame.time.get_ticks() * 100) > 0:
+            white_mask = pygame.mask.from_surface(self.image)
+            white_surf = white_mask.to_surface()
+            white_surf.set_colorkey("black")
+            self.image = white_surf
+
     def update(self, dt: float) -> None:
         self.old_rect = self.hitbox.copy()
         self.updateTimers()
@@ -273,3 +287,4 @@ class Player(pygame.sprite.Sprite):
 
         self.getState()
         self.animate(dt)
+        self.flicker()
