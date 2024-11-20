@@ -1,7 +1,9 @@
 import pygame
 from pygame import Vector2 as vector
+from random import randint, choice
 from GameSettings import WIN_WIDTH, WIN_HEIGHT, TILE_SIZE
-from MySprites import Sprite
+from MySprites import Sprite, Cloud
+from MyTimer import Timer
 
 
 class AllSprites(pygame.sprite.Group):
@@ -11,10 +13,11 @@ class AllSprites(pygame.sprite.Group):
         self.offset = vector()
         self.width = width * TILE_SIZE
         self.height = height * TILE_SIZE
+        self.win_size = (self.width, self.height)
         self.borders = {
             "left": 0,
             "right": -self.width + WIN_WIDTH,
-            "top": top_limit,
+            "top": -top_limit,
             "bottom": -self.height + WIN_HEIGHT,
         }
         self.sky = not bg_tile
@@ -27,7 +30,28 @@ class AllSprites(pygame.sprite.Group):
                     Sprite((x, y), bg_tile, self, -1)
         else:
             self.large_cloud = clouds["large"]
-            self.small_couds = clouds["small"]
+            self.small_clouds = clouds["small"]
+            self.cloud_direction = -1
+
+            # Large Cloud
+            self.large_cloud_speed = 50
+            self.large_cloud_x = 0
+            self.large_cloud_tiles = int(self.width / self.large_cloud.get_width()) + 2
+            self.large_cloud_width, self.large_cloud_height = (
+                self.large_cloud.get_size()
+            )
+
+            # Small Clouds
+            self.new_cloud = Timer(2500, self.createCloud, True)
+            self.new_cloud.activate()
+
+            for cloud in range(10):
+                pos = (
+                    randint(0, self.width),
+                    randint(self.borders["top"], self.horizon_line),
+                )
+                surf = choice(self.small_clouds)
+                Cloud(pos, surf, self)
 
     def cameraConstaint(self):
         # Horizontal
@@ -61,20 +85,50 @@ class AllSprites(pygame.sprite.Group):
     def drawSky(self):
         self.display.fill("#ddc6a1")
         horizon_pos = self.horizon_line + self.offset.y
-        
-        sea_rect = pygame.FRect((0, horizon_pos), (self.win_size[0], self.win_size[1] - horizon_pos))
-        pygame.draw.rect(self.display, "#92a9ce", sea_rect)
-        
-        pygame.draw.line(self.display, "#f5f1de", (0, horizon_pos), (self.win_size[0], horizon_pos), 4)
 
-    def draw(self, target_pos):
+        sea_rect = pygame.FRect(
+            (0, horizon_pos), (self.win_size[0], self.win_size[1] - horizon_pos)
+        )
+        pygame.draw.rect(self.display, "#92a9ce", sea_rect)
+
+        pygame.draw.line(
+            self.display,
+            "#f5f1de",
+            (0, horizon_pos),
+            (self.win_size[0], horizon_pos),
+            4,
+        )
+
+    def drawLargeCloud(self, dt):
+        self.large_cloud_x += self.large_cloud_speed * self.cloud_direction * dt
+        if self.large_cloud_x <= -self.large_cloud_width:
+            self.large_cloud_x = 0
+        for cloud in range(self.large_cloud_tiles):
+            x = self.large_cloud_x + cloud * self.large_cloud_width + self.offset.x
+            y = self.horizon_line - self.large_cloud_height - 100 + self.offset.y
+            self.display.blit(self.large_cloud, (x, y))
+
+    def createCloud(self):
+        pos = (
+            randint(self.width, self.width + 200),
+            randint(
+                self.borders["top"], 
+                max(0, int(self.horizon_line + self.offset.y))
+            ),
+        )
+        surf = choice(self.small_clouds)
+        Cloud(pos, surf, self)
+
+    def draw(self, target_pos, dt):
         self.updateBorders()
         self.offset.x = -(target_pos[0] - self.win_size[0] / 2)
         self.offset.y = -(target_pos[1] - self.win_size[1] / 2)
         self.cameraConstaint()
 
         if self.sky:
+            self.new_cloud.update()
             self.drawSky()
+            self.drawLargeCloud(dt)
 
         for sprite in sorted(self, key=lambda sprite: sprite.z):
             offset_pos = sprite.rect.topleft + self.offset

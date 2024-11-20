@@ -46,7 +46,7 @@ class Game:
             "flag": import_folder("Levels", "Graphics", "Level", "flag"),
             "bg_tiles": import_folder_dict("Levels", "Graphics", "Level", "BG", "Tiles"),
             "cloud_large": import_image("Levels", "Graphics", "Level", "BG", "Sky", "large_cloud"),
-            "cloud_small": import_folder("Levels", "Graphics", "Level", "BG", "Sky", "small_couds"),
+            "cloud_small": import_folder("Levels", "Graphics", "Level", "BG", "Sky", "small_clouds"),
             
         }
         self.font = pygame.font.Font(join("Levels", "Graphics", "UI", "runescape_uf.ttf"), 40)
@@ -65,8 +65,6 @@ class Game:
 
             self.cur_stage.run(dt)
             self.ui.update(dt)
-            # debug(self.data.health)
-            # debug(self.data.coins, 10, 50)
             pygame.display.update()
 
 

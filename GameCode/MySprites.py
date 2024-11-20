@@ -1,6 +1,7 @@
 import pygame
 from pygame.math import Vector2 as vector
 from math import sin, cos, radians
+from random import randint
 from GameSettings import TILE_SIZE, Z_LAYERS, ANIMATION_SPEED
 
 
@@ -49,6 +50,7 @@ class ParticleEffectSprite(AnimatedSprite):
             self.image = self.frames[int(self.frame_index)]
         else:
             self.kill()
+            del self
 
 
 class Item(AnimatedSprite):
@@ -151,3 +153,18 @@ class Spike(Sprite):
         x = self.center[0] + cos(radians(self.angle)) * self.radius
 
         self.rect.center = (x, y)
+
+
+class Cloud(Sprite):
+    def __init__(self, pos, surf, groups, z=Z_LAYERS["clouds"]):
+        super().__init__(pos, surf, groups, z)
+        self.speed = randint(30, 120)
+        self.direction = -1
+        self.rect.bottomleft = pos
+    
+    def update(self, dt):
+        self.rect.x += self.direction * self.speed * dt
+        
+        if self.rect.right <= 0:
+            self.kill()
+            del self

@@ -34,7 +34,7 @@ class Player(pygame.sprite.Sprite):
 
         # Movement values
         self.direction = vector()
-        self.speed = TILE_SIZE * 15
+        self.speed = TILE_SIZE * 10
         self.reg_speed = self.speed
         self.shift_speed = self.speed / 3
         self.gravity = 1300

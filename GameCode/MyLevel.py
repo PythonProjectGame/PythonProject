@@ -320,7 +320,7 @@ class Level:
 
         # Success
         if self.player.hitbox.colliderect(self.level_finish_rect):
-            print("won")
+            return None
 
     def run(self, dt):
         self.all_sprites.update(dt)
@@ -333,4 +333,4 @@ class Level:
 
         self.checkConstraint()
 
-        self.all_sprites.draw(self.player.hitbox.center)
+        self.all_sprites.draw(self.player.hitbox.center, dt)
