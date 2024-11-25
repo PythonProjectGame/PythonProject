@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="96">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="97">
  <tileset firstgid="1" source="../tilesets/Outside.tsx"/>
  <tileset firstgid="193" source="../tilesets/Grass.tsx"/>
  <tileset firstgid="213" source="../tilesets/Platforms.tsx"/>
@@ -436,7 +436,7 @@
     <property name="speed" type="int" value="100"/>
    </properties>
   </object>
-  <object id="75" name="saw" x="2709" y="555" width="456" height="12">
+  <object id="75" name="saw" x="2709" y="555" width="425.333" height="12">
    <properties>
     <property name="flip" type="bool" value="false"/>
     <property name="platform" type="bool" value="false"/>

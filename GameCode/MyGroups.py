@@ -17,7 +17,7 @@ class AllSprites(pygame.sprite.Group):
         self.borders = {
             "left": 0,
             "right": -self.width + WIN_WIDTH,
-            "top": -top_limit,
+            "top": top_limit,
             "bottom": -self.height + WIN_HEIGHT,
         }
         self.sky = not bg_tile
@@ -112,7 +112,7 @@ class AllSprites(pygame.sprite.Group):
         pos = (
             randint(self.width, self.width + 200),
             randint(
-                self.borders["top"], 
+                -self.borders["top"], 
                 max(0, int(self.horizon_line + self.offset.y))
             ),
         )
