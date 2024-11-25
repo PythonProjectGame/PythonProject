@@ -20,8 +20,9 @@ class Sprite(pygame.sprite.Sprite):
         # Rects
         self.rect = self.image.get_frect(topleft=pos)
         self.old_rect = self.rect.copy()
+        self.hit_rect = self.rect.inflate(-10, -10)
 
-        self.z = z
+        self.z = z   
 
 
 class AnimatedSprite(Sprite):
@@ -31,6 +32,7 @@ class AnimatedSprite(Sprite):
         self.frames, self.frame_index = frames, 0
         super().__init__(pos, self.frames[self.frame_index], groups, z)
         self.animation_speed = animation_speed
+        self.hit_rect = self.rect.inflate(-29, -29)
 
     def animate(self, dt):
         self.frame_index += self.animation_speed * dt
@@ -107,6 +109,7 @@ class MovingSprite(AnimatedSprite):
 
     def update(self, dt):
         self.old_rect = self.rect.copy()
+        self.hit_rect = self.rect.inflate(-10, -10)
         self.rect.topleft += self.direction * self.speed * dt
         self.check_borders()
 
@@ -153,6 +156,7 @@ class Spike(Sprite):
         x = self.center[0] + cos(radians(self.angle)) * self.radius
 
         self.rect.center = (x, y)
+        self.hit_rect = self.rect.inflate(-10, -10)
 
 
 class Cloud(Sprite):

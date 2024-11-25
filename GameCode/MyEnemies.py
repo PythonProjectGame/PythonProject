@@ -8,12 +8,13 @@ from MyTimer import Timer
 class Tooth(pygame.sprite.Sprite):
     def __init__(self, pos, frames, groups, collision_sprites):
         super().__init__(groups)
-        self.old_rect = self.rect
         self.frames, self.frame_index = frames, 0
         self.image = self.frames[self.frame_index]
 
         self.rect = self.image.get_frect(topleft=pos)
         self.z = Z_LAYERS["main"]
+        self.old_rect = self.rect
+        self.hit_rect = self.rect.inflate(-10, -10)
 
         self.direction = choice((-1, 1))
         self.collision_rects = [sprite.rect for sprite in collision_sprites]
@@ -30,6 +31,7 @@ class Tooth(pygame.sprite.Sprite):
     def update(self, dt):
         self.hit_timer.update()
         self.old_rect = self.rect
+        self.hit_rect = self.rect.inflate(-10, -10)
         
         # Animate
         self.frame_index += ANIMATION_SPEED * dt
@@ -73,6 +75,7 @@ class Shell(pygame.sprite.Sprite):
 
         self.image = self.frames[self.state][self.frame_index]
         self.rect = self.image.get_frect(topleft=pos)
+        self.hit_rect = self.rect.inflate(-10, -10)
         self.old_rect = self.rect.copy()
         self.z = Z_LAYERS["main"]
 
@@ -107,6 +110,7 @@ class Shell(pygame.sprite.Sprite):
     def update(self, dt):
         self.shoot_delay.update()
         self.stateManagement()
+        self.hit_rect = self.rect.inflate(-10, -10)
 
         # Animation / Attack
         self.frame_index += ANIMATION_SPEED * dt
@@ -130,9 +134,10 @@ class Shell(pygame.sprite.Sprite):
 class Pearl(pygame.sprite.Sprite):
     def __init__(self, pos, groups, surf, direction, speed):
         super().__init__(groups)
-
         self.image = surf
         self.rect = self.image.get_frect(center=pos + vector(direction * 50, 0))
+        self.hit_rect = self.rect.inflate(-5, -5)
+        
         self.direction = direction
         self.speed = speed
         self.z = Z_LAYERS["main"]
@@ -151,6 +156,7 @@ class Pearl(pygame.sprite.Sprite):
 
     def update(self, dt):
         self.rect.x += self.direction * self.speed * dt
+        self.hit_rect = self.rect.inflate(-5, -5)
         self.updateTimers()
 
         if not self.timers["lifetime"].active:
