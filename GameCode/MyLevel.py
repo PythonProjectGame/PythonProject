@@ -27,13 +27,16 @@ class Level:
         if tmx_level_properties["bg"]:
             bg_tile = level_frames["bg_tiles"][tmx_level_properties["bg"]]
         else:
-            bg_tile=None
+            bg_tile = None
 
         # Sprite Groups
         self.all_sprites = AllSprites(
             tmx_map.width,
             tmx_map.height,
-            {"large": level_frames["cloud_large"], "small": level_frames["cloud_small"]},
+            {
+                "large": level_frames["cloud_large"],
+                "small": level_frames["cloud_small"],
+            },
             tmx_level_properties["horizon_line"],
             bg_tile,
             tmx_level_properties["top_limit"],

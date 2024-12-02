@@ -20,19 +20,19 @@ class Tooth(pygame.sprite.Sprite):
         self.collision_rects = [sprite.rect for sprite in collision_sprites]
         self.speed = 200
         self.moving = True
-        
+
         self.hit_timer = Timer(200)
 
     def reverse(self):
         if not self.hit_timer.active:
             self.direction *= -1
             self.hit_timer.activate()
-        
+
     def update(self, dt):
         self.hit_timer.update()
         self.old_rect = self.rect
         self.hit_rect = self.rect.inflate(-10, -10)
-        
+
         # Animate
         self.frame_index += ANIMATION_SPEED * dt
         self.image = self.frames[int(self.frame_index % len(self.frames))]
@@ -45,7 +45,9 @@ class Tooth(pygame.sprite.Sprite):
         # Reverse Direction
         floor_rect_right = pygame.FRect(self.rect.bottomright, (1, 1))
         floor_rect_left = pygame.FRect(self.rect.bottomleft, (-1, 1))
-        wall_rect = pygame.FRect(self.rect.topleft + vector(1, 0), (self.rect.width + 2, 1))
+        wall_rect = pygame.FRect(
+            self.rect.topleft + vector(1, 0), (self.rect.width + 2, 1)
+        )
         if (
             floor_rect_right.collidelist(self.collision_rects) < 0
             and self.direction > 0
@@ -137,14 +139,13 @@ class Pearl(pygame.sprite.Sprite):
         self.image = surf
         self.rect = self.image.get_frect(center=pos + vector(direction * 50, 0))
         self.hit_rect = self.rect.inflate(-5, -5)
-        
+
         self.direction = direction
         self.speed = speed
         self.z = Z_LAYERS["main"]
-        self.timers = {"lifetime": Timer(5000),
-                       "reverse": Timer(200)}
+        self.timers = {"lifetime": Timer(5000), "reverse": Timer(200)}
         self.timers["lifetime"].activate()
-    
+
     def updateTimers(self):
         for timer in self.timers.values():
             timer.update()

@@ -15,7 +15,7 @@ class Player(pygame.sprite.Sprite):
         collision_sprites: [pygame.sprite.Sprite],
         semicollision_sprites: [pygame.sprite.Sprite],
         frames,
-        data
+        data,
     ) -> None:
         # General Setup
         super().__init__(groups)
@@ -65,14 +65,14 @@ class Player(pygame.sprite.Sprite):
             if keys[pygame.K_RIGHT] | keys[pygame.K_d]:
                 input_vector.x += 1
                 self.facing_right = True
-                
+
             if keys[pygame.K_LEFT] | keys[pygame.K_a]:
                 input_vector.x -= 1
                 self.facing_right = False
-                
+
             if keys[pygame.K_DOWN] | keys[pygame.K_s]:
                 self.timers["platform skip"].activate()
-            
+
             if keys[pygame.K_w]:
                 self.attack()
             self.direction.x = (
@@ -240,12 +240,12 @@ class Player(pygame.sprite.Sprite):
         self.frame_index += ANIMATION_SPEED * dt
         if self.state == "attack" and self.frame_index >= len(self.frames[self.state]):
             self.state = "idle"
-        
+
         self.image = self.frames[self.state][
             int(self.frame_index % len(self.frames[self.state]))
         ]
         self.image = self.image if self.facing_right else flip(self.image, True, False)
-        
+
         if self.attacking and self.frame_index > len(self.frames[self.state]):
             self.attacking = False
 
@@ -268,7 +268,7 @@ class Player(pygame.sprite.Sprite):
         if not self.timers["hit"].active:
             self.data.health -= 1
             self.timers["hit"].activate()
-    
+
     def flicker(self):
         if self.timers["hit"].active and sin(pygame.time.get_ticks() * 100) > 0:
             white_mask = pygame.mask.from_surface(self.image)

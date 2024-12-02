@@ -112,8 +112,7 @@ class AllSprites(pygame.sprite.Group):
         pos = (
             randint(self.width, self.width + 200),
             randint(
-                -self.borders["top"], 
-                max(0, int(self.horizon_line + self.offset.y))
+                -self.borders["top"], max(0, int(self.horizon_line + self.offset.y))
             ),
         )
         surf = choice(self.small_clouds)

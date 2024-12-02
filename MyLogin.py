@@ -5,6 +5,7 @@ import MyVal
 import _thread  # noqa: F401
 import Usefull.FancyPrint  # noqa: F401
 
+
 # main class inherits from tkinter window class
 class windows(tk.Tk):
     # constant fonts for buttons and lables

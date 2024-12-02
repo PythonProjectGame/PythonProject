@@ -22,7 +22,7 @@ class Sprite(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()
         self.hit_rect = self.rect.inflate(-10, -10)
 
-        self.z = z   
+        self.z = z
 
 
 class AnimatedSprite(Sprite):
@@ -60,7 +60,7 @@ class Item(AnimatedSprite):
         super().__init__(pos, frames, groups)
         self.item_type = item_type
         self.data = data
-    
+
     def activate(self):
         match self.item_type:
             case "gold":
@@ -165,10 +165,10 @@ class Cloud(Sprite):
         self.speed = randint(30, 120)
         self.direction = -1
         self.rect.bottomleft = pos
-    
+
     def update(self, dt):
         self.rect.x += self.direction * self.speed * dt
-        
+
         if self.rect.right <= 0:
             self.kill()
             del self
