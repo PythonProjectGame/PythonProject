@@ -1,13 +1,12 @@
-from tkinter import messagebox
 import tkinter as tk
+from tkinter import messagebox
+
 import MyNetwork
 import MyVal
-import _thread  # noqa: F401
-import Usefull.FancyPrint  # noqa: F401
 
 
 # main class inherits from tkinter window class
-class windows(tk.Tk):
+class Windows(tk.Tk):
     # constant fonts for buttons and lables
 
     def __init__(self, *args, **kwargs) -> None:
@@ -280,5 +279,5 @@ class NewAccount(tk.Frame):
 
 
 if __name__ == "__main__":
-    a = windows()
+    a = Windows()
     a.mainloop()

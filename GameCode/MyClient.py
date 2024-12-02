@@ -1,18 +1,19 @@
-import pygame
 import sys
-from pytmx.util_pygame import load_pygame
 from os.path import join
+
+import pygame
+from Debug import debug  # Noqa: F401
+from GameData import Data
+from GameSettings import WIN_HEIGHT, WIN_WIDTH
 from MyLevel import Level
-from GameSettings import WIN_WIDTH, WIN_HEIGHT
 from MySupport import (
     import_folder,
-    import_sub_folders,
-    import_image,
     import_folder_dict,
+    import_image,
+    import_sub_folders,
 )
-from GameData import Data
-from Debug import debug  # Noqa: F401
 from MyUi import UI
+from pytmx.util_pygame import load_pygame
 
 
 class Game:
@@ -83,6 +84,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        sys.exit()
 
             self.cur_stage.run(dt)
             self.ui.update(dt)
