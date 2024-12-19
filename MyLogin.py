@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
+import os
+import _thread
 
 import MyNetwork
 import MyVal
@@ -29,6 +31,7 @@ class Windows(tk.Tk):
             self.adjust, text="Back", command=lambda: self.show_frame(LoginPage)
         )
         back.grid(row=0, column=2)
+        self.focus = LoginPage
 
         # weights the first and third columns and rows to centre the frames
         self.grid_columnconfigure(0, weight=1)
@@ -44,8 +47,8 @@ class Windows(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=1, column=1, sticky="nsew")
 
-        # shows loginpage
-        self.show_frame(LoginPage)
+        # shows first frame
+        self.show_frame(self.focus)
 
         # sets minimum size of the window to the biggest frame
         self.minsize(
@@ -90,13 +93,6 @@ class LoginPage(tk.Frame):
         new_account.config(fg="blue", font=("Arial", 8, "italic"))
         new_account.grid(row=4, column=0, padx=5)
         new_account.bind("<Button-1>", lambda e: self.parent.show_frame(NewAccount))
-
-        # _thread.start_new_thread(
-        #     lambda: Usefull.FancyPrint.Print(
-        #         "New to MainProject?/Apply for a New Account", parent, new_account
-        #     ),
-        #     ()
-        # )
 
     def clear(self) -> None:
         self.uservar.set("Username")
@@ -163,9 +159,9 @@ class LoginPage(tk.Frame):
             login.close()
 
             if indata == "True":
-                self.parent.destroy()
+                self.parent.show_frame(LoggedIn)
             if indata == "Admin":
-                self.parent.destroy()
+                self.parent.show_frame(LoggedIn)
             if indata == "False":
                 messagebox.showwarning(title="Warning", message="Access Denied")
             return
@@ -181,6 +177,13 @@ class LoggedIn(tk.Frame):
     def __init__(self, parent, *args, **kwargs) -> None:
         self.parent = parent
         tk.Frame.__init__(self, self.parent)
+
+        play = tk.Button(self, text="Start Game", command=lambda: self.playGame())
+        play.grid(row=0, column=0)
+
+    def playGame(self):
+        self.parent.destroy()
+        os.system("python3 GameCode/MyClient.py")
 
 
 class NewAccount(tk.Frame):

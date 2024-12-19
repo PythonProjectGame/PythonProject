@@ -1,6 +1,7 @@
 import pygame
 from pygame import Vector2 as vector
 from random import uniform
+import sys
 from MySprites import (
     Sprite,
     AnimatedSprite,
@@ -11,12 +12,35 @@ from MySprites import (
 )
 from MyEnemies import Tooth, Shell, Pearl
 from MyPlayer import Player
-from GameSettings import TILE_SIZE, Z_LAYERS, ANIMATION_SPEED
+from GameSettings import *
 from MyGroups import AllSprites
 
 
 class Level:
-    def __init__(self, tmx_map, level_frames, data) -> None:
+    """
+    A class for handling the level properties and behavior.
+
+    :param tmx_map: The Tiled map object.
+    :param level_frames: The level frames dictionary.
+    :param data: The data object.
+    """
+
+    def __init__(
+        self,
+        tmx_map,
+        level_frames: dict[str, list[pygame.Surface]],
+        data,
+    ) -> None:
+        """
+        Initialize the level.
+
+        :param tmx_map: The Tiled map object.
+        :type tmx_map: pygame.tmx.TiledTileLayer
+        :param level_frames: The level frames dictionary.
+        :type level_frames: dict[str, list[pygame.Surface]]
+        :param data: The data object.
+        :type data: Data
+        """
         self.display = pygame.display.get_surface()
         self.data = data
 
@@ -25,8 +49,10 @@ class Level:
         self.level_height = tmx_map.height * TILE_SIZE
         tmx_level_properties = tmx_map.get_layer_by_name("Data")[0].properties
         if tmx_level_properties["bg"]:
+            # The background tile.
             bg_tile = level_frames["bg_tiles"][tmx_level_properties["bg"]]
         else:
+            # No background tile.
             bg_tile = None
 
         # Sprite Groups
@@ -41,6 +67,7 @@ class Level:
             bg_tile,
             tmx_level_properties["top_limit"],
         )
+        # The groups.
         self.collision_sprites = pygame.sprite.Group()
         self.semicollision_sprites = pygame.sprite.Group()
         self.damage_sprites = pygame.sprite.Group()
@@ -239,7 +266,7 @@ class Level:
                     (self.all_sprites, self.collision_sprites),
                     obj.properties["reverse"],
                     self.player,
-                    self.createPearl,
+                    self.create_pearl,
                 )
 
         # Items
@@ -252,7 +279,7 @@ class Level:
                 self.data,
             )
 
-    def createPearl(self, pos, direction):
+    def create_pearl(self, pos, direction):
         Pearl(
             pos,
             (self.all_sprites, self.damage_sprites, self.pearl_sprites),
@@ -261,7 +288,7 @@ class Level:
             150,
         )
 
-    def pearlCollision(self):
+    def pearl_collision(self):
         for sprite in self.collision_sprites:
             surf = pygame.sprite.spritecollide(sprite, self.pearl_sprites, True)
             if surf:
@@ -271,10 +298,10 @@ class Level:
                     self.all_sprites,
                 )
 
-    def hitCollision(self):
+    def hit_collision(self):
         for sprite in self.damage_sprites:
             if sprite.hit_rect.colliderect(self.player.hitbox):
-                self.player.getDamage()
+                self.player.get_damage()
                 if type(sprite) is Pearl:
                     ParticleEffectSprite(
                         sprite.rect.topleft + vector(-5, -5),
@@ -283,7 +310,7 @@ class Level:
                     )
                     sprite.kill()
 
-    def itemCollision(self):
+    def item_collision(self):
         for sprite in self.item_sprites:
             if sprite.hit_rect.colliderect(self.player.rect):
                 sprite.activate()
@@ -292,7 +319,7 @@ class Level:
                 )
                 sprite.kill()
 
-    def attackCollision(self):
+    def attack_collision(self):
         for target in self.pearl_sprites.sprites() + self.tooth_sprites.sprites():
             facing_target = (
                 self.player.rect.centerx < target.rect.centerx
@@ -308,7 +335,7 @@ class Level:
             ):
                 target.reverse()
 
-    def checkConstraint(self):
+    def check_constraint(self):
         # Left Right Constain
         if self.player.hitbox.left <= 0:
             self.player.hitbox.left = 0
@@ -316,22 +343,28 @@ class Level:
             self.player.hitbox.right = self.level_width
 
         # Bottom
-        if self.player.hitbox.bottom >= self.level_height:
-            self.player.kill()
+        if self.player.hitbox.y >= self.level_height:
+            self.data.dead = True
 
         # Success
         if self.player.hitbox.colliderect(self.level_finish_rect):
             return None
 
+    def check_life(self):
+        if self.data.dead:
+            self.player.kill()
+            pygame.quit()
+            sys.exit()
+
     def run(self, dt):
         self.all_sprites.update(dt)
-        self.display.fill("black")
 
-        self.pearlCollision()
-        self.hitCollision()
-        self.itemCollision()
-        self.attackCollision()
+        self.pearl_collision()
+        self.hit_collision()
+        self.item_collision()
+        self.attack_collision()
 
-        self.checkConstraint()
+        self.check_constraint()
+        self.check_life()
 
         self.all_sprites.draw(self.player.hitbox.center, dt)

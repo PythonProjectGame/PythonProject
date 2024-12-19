@@ -3,7 +3,8 @@ class Data:
         self.ui = ui
         self._coins = 0
         self._health = 5
-        self.ui.createHearts(self._health)
+        self.ui.create_hearts(self._health)
+        self._dead = False
 
     @property
     def coins(self):
@@ -15,7 +16,7 @@ class Data:
         if self._coins >= 100:
             self.coins -= 100
             self.health += 1
-        self.ui.showCoins(self.coins)
+        self.ui.show_coins(self.coins)
 
     @property
     def health(self):
@@ -24,4 +25,14 @@ class Data:
     @health.setter
     def health(self, val):
         self._health = val
-        self.ui.createHearts(val)
+        self.ui.create_hearts(val)
+        if self._health <= 0:
+            self._dead = True
+
+    @property
+    def dead(self):
+        return self._dead
+
+    @dead.setter
+    def dead(self, val):
+        self._dead = val

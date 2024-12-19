@@ -2,7 +2,7 @@ import pygame
 from pygame.math import Vector2 as vector
 from math import sin, cos, radians
 from random import randint
-from GameSettings import TILE_SIZE, Z_LAYERS, ANIMATION_SPEED
+from GameSettings import *
 
 
 class Sprite(pygame.sprite.Sprite):
