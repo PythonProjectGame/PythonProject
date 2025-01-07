@@ -1,7 +1,7 @@
 import pygame
 from pygame import Vector2 as vector
 from random import uniform
-import sys
+import json
 from MySprites import (
     Sprite,
     AnimatedSprite,
@@ -12,7 +12,6 @@ from MySprites import (
 )
 from MyEnemies import Tooth, Shell, Pearl
 from MyPlayer import Player
-from GameSettings import *
 from MyGroups import AllSprites
 
 
@@ -29,34 +28,50 @@ class Level:
         self,
         tmx_map,
         level_frames: dict[str, list[pygame.Surface]],
+        audio: dict[str, pygame.mixer.Sound],
         data,
     ) -> None:
         """
         Initialize the level.
 
         :param tmx_map: The Tiled map object.
-        :type tmx_map: pygame.tmx.TiledTileLayer
         :param level_frames: The level frames dictionary.
-        :type level_frames: dict[str, list[pygame.Surface]]
+        :param audio: The audio dictionary.
         :param data: The data object.
         :type data: Data
         """
-        self.display = pygame.display.get_surface()
-        self.data = data
+
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
+        # The display surface.
+        self.display: pygame.Surface = pygame.display.get_surface()
+
+        # The data object.
+        self.data: Data = data
 
         # Level Data
-        self.level_width = tmx_map.width * TILE_SIZE
-        self.level_height = tmx_map.height * TILE_SIZE
+        # The width and height of the level in pixels.
+        self.level_width: int = tmx_map.width * self.settings["TILE_SIZE"]
+        self.level_height: int = tmx_map.height * self.settings["TILE_SIZE"]
+
+        # Level properties from the Tiled map.
         tmx_level_properties = tmx_map.get_layer_by_name("Data")[0].properties
+
+        # The background tile.
         if tmx_level_properties["bg"]:
-            # The background tile.
-            bg_tile = level_frames["bg_tiles"][tmx_level_properties["bg"]]
+            bg_tile: pygame.Surface = level_frames["bg_tiles"][
+                tmx_level_properties["bg"]
+            ]
         else:
             # No background tile.
-            bg_tile = None
+            bg_tile: pygame.Surface = None
 
         # Sprite Groups
-        self.all_sprites = AllSprites(
+        # The main sprite group.
+        self.all_sprites: AllSprites = AllSprites(
             tmx_map.width,
             tmx_map.height,
             {
@@ -67,20 +82,68 @@ class Level:
             bg_tile,
             tmx_level_properties["top_limit"],
         )
+
         # The groups.
+        # The collision sprite group.
         self.collision_sprites = pygame.sprite.Group()
+        # The semicollision sprite group.
         self.semicollision_sprites = pygame.sprite.Group()
+        # The damage sprite group.
         self.damage_sprites = pygame.sprite.Group()
+        # The tooth sprite group.
         self.tooth_sprites = pygame.sprite.Group()
+        # The pearl sprite group.
         self.pearl_sprites = pygame.sprite.Group()
+        # The item sprite group.
         self.item_sprites = pygame.sprite.Group()
 
         # Surfaces
-        self.setup(tmx_map, level_frames)
-        self.pearl_surf = level_frames["pearl"]
-        self.particle_surf = level_frames["particle"]
+        # Set up the level.
+        self.setup(tmx_map, level_frames, audio)
 
-    def setup(self, tmx_map, level_frames):
+        # The pearl surface.
+        self.pearl_surf: pygame.Surface = level_frames["pearl"]
+        # The particle surface.
+        self.particle_surf: pygame.Surface = level_frames["particle"]
+
+        # Sound
+        # The coin sound.
+        self.coin_sound = audio["coin"]
+        # The coin sound volume.
+        self.coin_sound.set_volume(
+            0.1
+            * self.settings["SOUND"]["SOUND_VOLUME"]
+            * self.settings["SOUND"]["SFX_VOLUME"]
+        )
+        # The pearl sound.
+        self.pearl_sound = audio["pearl"]
+        self.pearl_sound.set_volume(
+            1
+            * self.settings["SOUND"]["SOUND_VOLUME"]
+            * self.settings["SOUND"]["SFX_VOLUME"]
+        )
+        # The hit sound
+        self.hit_sound = audio["hit"]
+        # The hit sound volume.
+        self.hit_sound.set_volume(
+            0.5
+            * self.settings["SOUND"]["SOUND_VOLUME"]
+            * self.settings["SOUND"]["SFX_VOLUME"]
+        )
+        # The win sound.
+        self.win_sound = audio["win"]
+        # The win sound volume.
+        self.win_sound.set_volume(
+            0.1
+            * self.settings["SOUND"]["SOUND_VOLUME"]
+            * self.settings["SOUND"]["SFX_VOLUME"]
+        )
+
+    def setup(self, tmx_map, level_frames, audio):
+        Z_LAYERS = self.settings["Z_LAYERS"]
+        TILE_SIZE = self.settings["TILE_SIZE"]
+        ANIMATION_SPEED = self.settings["ANIMATION_SPEED"]
+
         # Tiles
         for layer in ["BG", "Terrain", "FG", "Platforms"]:
             for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
@@ -136,6 +199,9 @@ class Level:
                     self.semicollision_sprites,
                     level_frames["player"],
                     self.data,
+                    attack_sound=audio["attack"],
+                    jump_sound=audio["jump"],
+                    damage_sound=audio["damage"],
                 )
             else:
                 if obj.name in ["barrel", "crate"]:
@@ -287,6 +353,7 @@ class Level:
             direction,
             150,
         )
+        self.pearl_sound.play()
 
     def pearl_collision(self):
         for sprite in self.collision_sprites:
@@ -317,6 +384,7 @@ class Level:
                 ParticleEffectSprite(
                     sprite.rect.topleft, self.particle_surf, self.all_sprites
                 )
+                self.coin_sound.play()
                 sprite.kill()
 
     def attack_collision(self):
@@ -334,6 +402,7 @@ class Level:
                 and facing_target
             ):
                 target.reverse()
+                self.hit_sound.play()
 
     def check_constraint(self):
         # Left Right Constain
@@ -348,13 +417,8 @@ class Level:
 
         # Success
         if self.player.hitbox.colliderect(self.level_finish_rect):
-            return None
-
-    def check_life(self):
-        if self.data.dead:
-            self.player.kill()
-            pygame.quit()
-            sys.exit()
+            pygame.mixer.music.stop()
+            self.win_sound.play()
 
     def run(self, dt):
         self.all_sprites.update(dt)
@@ -365,6 +429,5 @@ class Level:
         self.attack_collision()
 
         self.check_constraint()
-        self.check_life()
 
         self.all_sprites.draw(self.player.hitbox.center, dt)

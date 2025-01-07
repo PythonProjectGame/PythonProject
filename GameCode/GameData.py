@@ -25,9 +25,11 @@ class Data:
     @health.setter
     def health(self, val):
         self._health = val
-        self.ui.create_hearts(val)
         if self._health <= 0:
             self._dead = True
+        if self._health >= 5:
+            self._health = 5
+        self.ui.create_hearts(self._health)
 
     @property
     def dead(self):

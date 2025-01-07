@@ -2,7 +2,7 @@ import pygame
 from pygame.math import Vector2 as vector
 from pygame.transform import flip
 from math import sin
-from GameSettings import *
+import json
 from MyTimer import Timer
 
 
@@ -28,13 +28,22 @@ class Player(pygame.sprite.Sprite):
         semicollision_sprites: [pygame.sprite.Sprite],
         frames,
         data,
+        attack_sound,
+        jump_sound,
+        damage_sound,
     ) -> None:
         # General Setup
         """
         Initialize the player sprite.
         """
+
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
         super().__init__(groups)
-        self.z = Z_LAYERS["main"]
+        self.z = self.settings["Z_LAYERS"]["main"]
         self.data = data
 
         # Image
@@ -50,7 +59,7 @@ class Player(pygame.sprite.Sprite):
         The player's rectangles.
         """
         self.rect = self.image.get_frect(topleft=pos - vector(20, 20))
-        self.hitbox = self.rect.inflate(-76, -36)  # -41, -24
+        self.hitbox = self.rect.inflate(-76, -36)
         self.old_rect = self.hitbox.copy()
 
         # Movement values
@@ -58,12 +67,12 @@ class Player(pygame.sprite.Sprite):
         The player's movement values.
         """
         self.direction = vector()
-        self.speed = TILE_SIZE * 10
+        self.speed = self.settings["TILE_SIZE"] * 10
         self.reg_speed = self.speed
         self.shift_speed = self.speed / 3
         self.gravity = 1300
         self.jump = False
-        self.jump_height = TILE_SIZE * 20
+        self.jump_height = self.settings["TILE_SIZE"] * 20
         self.attacking = False
 
         # Collisions
@@ -84,8 +93,23 @@ class Player(pygame.sprite.Sprite):
             "wall slide block": Timer(250),
             "platform skip": Timer(100),
             "attack block": Timer(500),
-            "hit": Timer(400),
+            "hit": Timer(800),
         }
+
+        # Audio
+        self.attack_sound = attack_sound
+        self.jump_sound = jump_sound
+        self.jump_sound.set_volume(
+            0.1
+            * self.settings["SOUND"]["SOUND_VOLUME"]
+            * self.settings["SOUND"]["SFX_VOLUME"]
+        )
+        self.damage_sound = damage_sound
+        self.damage_sound.set_volume(
+            0.6
+            * self.settings["SOUND"]["SOUND_VOLUME"]
+            * self.settings["SOUND"]["SFX_VOLUME"]
+        )
 
     def input(self) -> None:
         """
@@ -154,6 +178,7 @@ class Player(pygame.sprite.Sprite):
             self.frame_index: int = 0
             # Activate the attack cooldown timer
             self.timers["attack block"].activate()
+            self.attack_sound.play()
 
     def move(self, dt: float) -> None:
         """
@@ -187,6 +212,7 @@ class Player(pygame.sprite.Sprite):
                 self.direction.y = -self.jump_height
                 self.timers["wall slide block"].activate()
                 self.hitbox.bottom -= 1
+                self.jump_sound.play()
             elif (
                 any((self.on_surface["left"], self.on_surface["right"]))
                 and not self.timers["wall slide block"].active
@@ -195,6 +221,7 @@ class Player(pygame.sprite.Sprite):
                 self.timers["wall jump"].activate()
                 self.direction.y = -self.jump_height
                 self.direction.x = 1 if self.on_surface["left"] else -1
+                self.jump_sound.play()
             self.jump = False
 
         self.collision("Vertical")
@@ -341,7 +368,7 @@ class Player(pygame.sprite.Sprite):
             timer.update()
 
     def animate(self, dt):
-        self.frame_index += ANIMATION_SPEED * dt
+        self.frame_index += self.settings["ANIMATION_SPEED"] * dt
         if self.state == "attack" and self.frame_index >= len(self.frames[self.state]):
             self.state = "idle"
 
@@ -371,6 +398,7 @@ class Player(pygame.sprite.Sprite):
     def get_damage(self):
         if not self.timers["hit"].active:
             self.data.health -= 1
+            self.damage_sound.play()
             self.timers["hit"].activate()
 
     def flicker(self):

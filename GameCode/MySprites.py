@@ -2,16 +2,24 @@ import pygame
 from pygame.math import Vector2 as vector
 from math import sin, cos, radians
 from random import randint
-from GameSettings import *
+import json
 
 
 class Sprite(pygame.sprite.Sprite):
+
+    # Getting Game Settings
+    with open("GameCode/GameSettings.json", "r") as f:
+        x = f.read()
+        settings = json.loads(x)
+
     def __init__(
         self,
         pos: tuple,
-        surf: pygame.Surface = pygame.Surface((TILE_SIZE, TILE_SIZE)),
+        surf: pygame.Surface = pygame.Surface(
+            (settings["TILE_SIZE"], settings["TILE_SIZE"])
+        ),
         groups: [pygame.sprite.Group] = None,
-        z: int = Z_LAYERS["main"],
+        z: int = settings["Z_LAYERS"]["main"],
     ):
         super().__init__(groups)
 
@@ -26,8 +34,19 @@ class Sprite(pygame.sprite.Sprite):
 
 
 class AnimatedSprite(Sprite):
+
+    # Getting Game Settings
+    with open("GameCode/GameSettings.json", "r") as f:
+        x = f.read()
+        settings = json.loads(x)
+
     def __init__(
-        self, pos, frames, groups, z=Z_LAYERS["main"], animation_speed=ANIMATION_SPEED
+        self,
+        pos,
+        frames,
+        groups,
+        z=settings["Z_LAYERS"]["main"],
+        animation_speed=settings["ANIMATION_SPEED"],
     ):
         self.frames, self.frame_index = frames, 0
         super().__init__(pos, self.frames[self.frame_index], groups, z)
@@ -43,8 +62,14 @@ class AnimatedSprite(Sprite):
 
 
 class ParticleEffectSprite(AnimatedSprite):
+
+    # Getting Game Settings
+
     def __init__(self, pos, frames, groups):
-        super().__init__(pos, frames, groups, Z_LAYERS["fg"])
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+        super().__init__(pos, frames, groups, self.settings["Z_LAYERS"]["fg"])
 
     def animate(self, dt):
         self.frame_index += self.animation_speed * dt
@@ -117,6 +142,11 @@ class MovingSprite(AnimatedSprite):
 
 
 class Spike(Sprite):
+
+    with open("GameCode/GameSettings.json", "r") as f:
+        x = f.read()
+        settings = json.loads(x)
+
     def __init__(
         self,
         pos,
@@ -126,7 +156,7 @@ class Spike(Sprite):
         speed,
         start_angle,
         end_angle,
-        z=Z_LAYERS["main"],
+        z=settings["Z_LAYERS"]["main"],
     ):
         self.center = pos
         self.radius = radius
@@ -160,7 +190,12 @@ class Spike(Sprite):
 
 
 class Cloud(Sprite):
-    def __init__(self, pos, surf, groups, z=Z_LAYERS["clouds"]):
+
+    with open("GameCode/GameSettings.json", "r") as f:
+        x = f.read()
+        settings = json.loads(x)
+
+    def __init__(self, pos, surf, groups, z=settings["Z_LAYERS"]["clouds"]):
         super().__init__(pos, surf, groups, z)
         self.speed = randint(30, 120)
         self.direction = -1

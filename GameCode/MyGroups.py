@@ -1,7 +1,7 @@
 import pygame
 from pygame import Vector2 as vector
 from random import randint, choice
-from GameSettings import WIN_WIDTH, WIN_HEIGHT, TILE_SIZE
+import json
 from MySprites import Sprite, Cloud
 from MyTimer import Timer
 
@@ -9,16 +9,22 @@ from MyTimer import Timer
 class AllSprites(pygame.sprite.Group):
     def __init__(self, width, height, clouds, horizon_line, bg_tile=None, top_limit=0):
         super().__init__()
+
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
         self.display = pygame.display.get_surface()
         self.offset = vector()
-        self.width = width * TILE_SIZE
-        self.height = height * TILE_SIZE
+        self.width = width * self.settings["TILE_SIZE"]
+        self.height = height * self.settings["TILE_SIZE"]
         self.win_size = (self.width, self.height)
         self.borders = {
             "left": 0,
-            "right": -self.width + WIN_WIDTH,
+            "right": -self.width + self.settings["WIN_WIDTH"],
             "top": top_limit,
-            "bottom": -self.height + WIN_HEIGHT,
+            "bottom": -self.height + self.settings["WIN_HEIGHT"],
         }
         self.sky = not bg_tile
         self.horizon_line = horizon_line

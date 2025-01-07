@@ -1,18 +1,23 @@
 import pygame
+import json
 from pygame import Vector2 as vector
 from random import choice
-from GameSettings import Z_LAYERS, ANIMATION_SPEED
 from MyTimer import Timer
 
 
 class Tooth(pygame.sprite.Sprite):
     def __init__(self, pos, frames, groups, collision_sprites):
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
         super().__init__(groups)
         self.frames, self.frame_index = frames, 0
         self.image = self.frames[self.frame_index]
 
         self.rect = self.image.get_frect(topleft=pos)
-        self.z = Z_LAYERS["main"]
+        self.z = self.settings["Z_LAYERS"]["main"]
         self.old_rect = self.rect
         self.hit_rect = self.rect.inflate(-10, -10)
 
@@ -34,7 +39,7 @@ class Tooth(pygame.sprite.Sprite):
         self.hit_rect = self.rect.inflate(-10, -10)
 
         # Animate
-        self.frame_index += ANIMATION_SPEED * dt
+        self.frame_index += self.settings["ANIMATION_SPEED"] * dt
         self.image = self.frames[int(self.frame_index % len(self.frames))]
         if self.direction < 0:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -61,6 +66,12 @@ class Tooth(pygame.sprite.Sprite):
 class Shell(pygame.sprite.Sprite):
     def __init__(self, pos, frames, groups, reverse, player, create_pearl):
         super().__init__(groups)
+
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
         if reverse:
             self.frames = {}
             for key, surfs in frames.items():
@@ -79,7 +90,7 @@ class Shell(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(topleft=pos)
         self.hit_rect = self.rect.inflate(-10, -10)
         self.old_rect = self.rect.copy()
-        self.z = Z_LAYERS["main"]
+        self.z = self.settings["Z_LAYERS"]["main"]
 
         self.player = player
         self.shoot_delay = Timer(2000)
@@ -115,7 +126,7 @@ class Shell(pygame.sprite.Sprite):
         self.hit_rect = self.rect.inflate(-10, -10)
 
         # Animation / Attack
-        self.frame_index += ANIMATION_SPEED * dt
+        self.frame_index += self.settings["ANIMATION_SPEED"] * dt
         if self.frame_index < len(self.frames[self.state]):
             self.image = self.frames[self.state][int(self.frame_index)]
 
@@ -136,13 +147,19 @@ class Shell(pygame.sprite.Sprite):
 class Pearl(pygame.sprite.Sprite):
     def __init__(self, pos, groups, surf, direction, speed):
         super().__init__(groups)
+
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
         self.image = surf
         self.rect = self.image.get_frect(center=pos + vector(direction * 50, 0))
         self.hit_rect = self.rect.inflate(-5, -5)
 
         self.direction = direction
         self.speed = speed
-        self.z = Z_LAYERS["main"]
+        self.z = self.settings["Z_LAYERS"]["main"]
         self.timers = {"lifetime": Timer(5000), "reverse": Timer(200)}
         self.timers["lifetime"].activate()
 

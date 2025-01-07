@@ -1,7 +1,7 @@
 import pygame
+import json
 from MySprites import AnimatedSprite
 from random import randint
-from GameSettings import *
 from MyTimer import Timer
 
 
@@ -14,6 +14,12 @@ class UI:
         :param font: The font to use for the user interface.
         :param frames: The frames for the heart sprites.
         """
+
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
         self.display = pygame.display.get_surface()
         self.sprites = pygame.sprite.Group()
         self.font = font
@@ -81,6 +87,12 @@ class Heart(AnimatedSprite):
         :param frames: The frames of the heart.
         :param groups: The groups the heart should be in.
         """
+
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
         super().__init__(pos, frames, groups)
         self.active = False
 
@@ -89,7 +101,7 @@ class Heart(AnimatedSprite):
 
         :param dt: The time passed since the last frame.
         """
-        self.frame_index += ANIMATION_SPEED * dt
+        self.frame_index += self.settings["ANIMATION_SPEED"] * dt
         if self.frame_index < len(self.frames):
             self.image = self.frames[int(self.frame_index)]
         else:

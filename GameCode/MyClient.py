@@ -2,9 +2,9 @@ import sys
 from os.path import join
 
 import pygame
+import json
 from Debug import debug
 from GameData import Data
-from GameSettings import *
 from MyLevel import Level
 from MySupport import (
     import_folder,
@@ -30,12 +30,19 @@ class Game:
         creates the UI, loads the data, loads the Tiled map, and creates the
         current level.
         """
+
+        # Getting Game Settings
+        with open("GameCode/GameSettings.json", "r") as f:
+            x = f.read()
+            self.settings = json.loads(x)
+
         # Initialize Pygame
         pygame.init()
+        pygame.mixer.init()
 
         # Create the window
         self.display = pygame.display.set_mode(
-            (WIN_WIDTH, WIN_HEIGHT),  # pygame.FULLSCREEN
+            (self.settings["WIN_WIDTH"], self.settings["WIN_HEIGHT"])
         )
 
         # Set the caption
@@ -54,10 +61,20 @@ class Game:
         self.data = Data(self.ui)
 
         # Load the Tiled map
-        self.tmx_maps = {0: load_pygame(join("Levels", "tmx", "omni.tmx"))}
+        self.tmx_maps = {
+            0: load_pygame(join("Levels", "tmx", "omni.tmx")),
+        }
 
         # Create the current level
-        self.cur_stage = Level(self.tmx_maps[0], self.level_frames, self.data)
+        self.cur_stage = Level(
+            self.tmx_maps[0], self.level_frames, self.audio, self.data
+        )
+        pygame.mixer.music.set_volume(
+            0.3
+            * self.settings["SOUND"]["SOUND_VOLUME"]
+            * self.settings["SOUND"]["MUSIC_VOLUME"]
+        )
+        pygame.mixer.music.play(-1)
 
     def importAssets(self):
         """
@@ -121,6 +138,46 @@ class Game:
             "coin": import_image("Levels", "Graphics", "UI", "coin"),
         }
 
+        self.audio = {
+            "coin": pygame.mixer.Sound(join("Levels", "Audio", "coin.wav")),
+            "jump": pygame.mixer.Sound(join("Levels", "Audio", "jump.wav")),
+            "attack": pygame.mixer.Sound(join("Levels", "Audio", "attack.wav")),
+            "hit": pygame.mixer.Sound(join("Levels", "Audio", "hit.wav")),
+            "damage": pygame.mixer.Sound(join("Levels", "Audio", "damage.wav")),
+            "pearl": pygame.mixer.Sound(join("Levels", "Audio", "pearl.wav")),
+            "win": pygame.mixer.Sound(join("Levels", "Audio", "win.wav")),
+            "lose": pygame.mixer.Sound(join("Levels", "Audio", "lose.wav")),
+        }
+
+        self.bg_audio = {
+            "pixel-song-20": join("Levels", "Audio", "pixel-song-20.mp3"),
+            "pixel-song-21": join("Levels", "Audio", "pixel-song-21.mp3"),
+            "sometimes-i": join("Levels", "Audio", "sometimes-i.mp3"),
+            "starlight_city": join("Levels", "Audio", "starlight_city.mp3"),
+        }
+
+        pygame.mixer.music.load(
+            self.bg_audio[self.settings["BG_MUSIC"][self.settings["SONG_CHOICE"]]]
+        )
+
+    def switch_stage(self, stage: int) -> None:
+        pass
+
+    def check_game_over(self) -> None:
+        if self.data.dead:
+            # Quit the game if the player is dead
+            pygame.mixer.music.stop()
+            lose = self.audio["lose"]
+            lose.set_volume(
+                1
+                * self.settings["SOUND"]["SOUND_VOLUME"]
+                * self.settings["SOUND"]["MUSIC_VOLUME"]
+            )
+            lose.play()
+            pygame.time.wait(2000)
+            pygame.quit()
+            sys.exit()
+
     def run(self) -> None:
         """
         The main loop of the game.
@@ -143,6 +200,8 @@ class Game:
                         # Quit the game if the user presses the escape key
                         pygame.quit()
                         sys.exit()
+
+            self.check_game_over()
 
             # Update the current level
             self.cur_stage.run(dt)
