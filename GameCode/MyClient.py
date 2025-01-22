@@ -62,12 +62,21 @@ class Game:
 
         # Load the Tiled map
         self.tmx_maps = {
-            0: load_pygame(join("Levels", "tmx", "omni.tmx")),
+            0: load_pygame(join("Levels", "tmx", "1.tmx")),
+            1: load_pygame(join("Levels", "tmx", "2.tmx")),
+            2: load_pygame(join("Levels", "tmx", "3.tmx")),
+            3: load_pygame(join("Levels", "tmx", "4.tmx")),
+            4: load_pygame(join("Levels", "tmx", "5.tmx")),
+            5: load_pygame(join("Levels", "tmx", "6.tmx")),
+            "omni": load_pygame(join("Levels", "tmx", "omni.tmx")),
         }
 
         # Create the current level
         self.cur_stage = Level(
-            self.tmx_maps[0], self.level_frames, self.audio, self.data
+            self.tmx_maps[self.settings["LEVEL_CHOICE"]],
+            self.level_frames,
+            self.audio,
+            self.data,
         )
         pygame.mixer.music.set_volume(
             0.3
@@ -147,6 +156,9 @@ class Game:
             "pearl": pygame.mixer.Sound(join("Levels", "Audio", "pearl.wav")),
             "win": pygame.mixer.Sound(join("Levels", "Audio", "win.wav")),
             "lose": pygame.mixer.Sound(join("Levels", "Audio", "lose.wav")),
+            "level_unlock": pygame.mixer.Sound(
+                join("Levels", "Audio", "level_unlock.wav")
+            ),
         }
 
         self.bg_audio = {

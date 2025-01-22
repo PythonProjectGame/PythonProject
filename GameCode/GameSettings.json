@@ -24,5 +24,7 @@
         "sometimes-i",
         "starlight_city"
     ],
-    "SONG_CHOICE": 3
+    "SONG_CHOICE": 3,
+    "CURRENT_LEVEL": 0,
+    "LEVEL_CHOICE": 0
 }

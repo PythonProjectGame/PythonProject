@@ -50,7 +50,7 @@ class Windows(tk.Tk):
 
         # creates a dictionary of frames via classes
         self.frames = {}
-        for F in (LoginPage, LoggedIn, NewAccount, Sound, BGMusic):
+        for F in (LoginPage, LoggedIn, NewAccount, Sound, BGMusic, LevelSelect):
             frame = F(self)
 
             self.frames[F] = frame
@@ -220,6 +220,10 @@ class LoginPage(tk.Frame):
 
                 self.parent.settings.add_command(
                     label="Music", command=lambda: self.parent.show_frame(BGMusic)
+                )
+
+                self.parent.settings.add_command(
+                    label="Level", command=lambda: self.parent.show_frame(LevelSelect)
                 )
 
                 self.parent.file.delete(1)
@@ -466,7 +470,7 @@ class BGMusic(tk.Frame):
         self.v.set(self.game_settings["SONG_CHOICE"])
 
         for song in music:
-            button = tk.Radiobutton(
+            button = ttk.Radiobutton(
                 self,
                 text=song,
                 value=music.index(song),
@@ -480,6 +484,34 @@ class BGMusic(tk.Frame):
         with open("GameCode/GameSettings.json", "r+") as f:
             self.game_settings = json.load(f)
             self.game_settings["SONG_CHOICE"] = self.v.get()
+            f.seek(0)
+            json.dump(self.game_settings, f, indent=4)
+            f.truncate()
+
+
+class LevelSelect(tk.Frame):
+    def __init__(self, parent, *args, **kwargs) -> None:
+        self.parent = parent
+        tk.Frame.__init__(self, self.parent)
+
+        self.v = tk.IntVar()
+
+        for level in range(0, 5):
+            button = ttk.Radiobutton(
+                self,
+                text=f"Level {level + 1}",
+                value=level,
+                variable=self.v,
+                command=self.change_level,
+            )
+            button.grid(row=level + 1, column=0, sticky="w")
+
+        self.change_level()
+
+    def change_level(self):
+        with open("GameCode/GameSettings.json", "r+") as f:
+            self.game_settings = json.load(f)
+            self.game_settings["LEVEL_CHOICE"] = self.v.get()
             f.seek(0)
             json.dump(self.game_settings, f, indent=4)
             f.truncate()

@@ -58,12 +58,12 @@ class Level:
         self.level_height: int = tmx_map.height * self.settings["TILE_SIZE"]
 
         # Level properties from the Tiled map.
-        tmx_level_properties = tmx_map.get_layer_by_name("Data")[0].properties
+        self.tmx_level_properties = tmx_map.get_layer_by_name("Data")[0].properties
 
         # The background tile.
-        if tmx_level_properties["bg"]:
+        if self.tmx_level_properties["bg"]:
             bg_tile: pygame.Surface = level_frames["bg_tiles"][
-                tmx_level_properties["bg"]
+                self.tmx_level_properties["bg"]
             ]
         else:
             # No background tile.
@@ -78,9 +78,9 @@ class Level:
                 "large": level_frames["cloud_large"],
                 "small": level_frames["cloud_small"],
             },
-            tmx_level_properties["horizon_line"],
+            self.tmx_level_properties["horizon_line"],
             bg_tile,
-            tmx_level_properties["top_limit"],
+            self.tmx_level_properties["top_limit"],
         )
 
         # The groups.
