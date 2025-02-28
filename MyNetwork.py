@@ -5,7 +5,7 @@ import pickle
 class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = "127.0.0.1"
+        self.server = "10.2.7.241"
         self.port = 5555
         self.addr = (self.server, self.port)
         self.p = self.connect()
@@ -17,7 +17,7 @@ class Network:
         try:
             self.client.connect(self.addr)
             return True
-        except:  # noqa: E722
+        except:
             return False
 
     def send(self, data):
@@ -30,5 +30,5 @@ class Network:
     def close(self) -> None:
         try:
             self.client.send(pickle.dumps("exit"))
-        except:  # noqa: E722
+        except:
             pass

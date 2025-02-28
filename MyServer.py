@@ -5,7 +5,7 @@ import bcrypt
 import _thread
 
 
-host = "127.0.0.1"
+host = "10.2.7.241"
 
 port = 5555
 
@@ -52,7 +52,7 @@ def inputData(data: list) -> any:
                 return "False"
 
             # Check if the password matches the one in the database
-            if bcrypt.checkpw(password.encode(), pswd):
+            if bcrypt.checkpw(password.encode(), pswd.encode()):
                 # If the password matches, get the access right of the user
                 cursor.execute(
                     f"select AccessRight from LoginData where Username='{username}'"

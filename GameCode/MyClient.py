@@ -1,5 +1,6 @@
 import sys
 from os.path import join
+import cProfile
 
 import pygame
 import json
@@ -46,7 +47,7 @@ class Game:
         )
 
         # Set the caption
-        pygame.display.set_caption("Sound Assassin")
+        pygame.display.set_caption("Pirate Cove")
 
         # Create the clock
         self.clock = pygame.time.Clock()
@@ -227,4 +228,4 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
-    game.run()
+    cProfile.run('game.run()', sort='ncalls')

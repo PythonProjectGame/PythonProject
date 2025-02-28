@@ -4,6 +4,7 @@ from tkinter import messagebox
 import os
 import _thread
 import json
+import cProfile
 
 import MyNetwork
 import MyVal
@@ -497,7 +498,7 @@ class LevelSelect(tk.Frame):
         self.v = tk.IntVar()
 
         for level in range(0, 5):
-            button = ttk.Radiobutton(
+            button = tk.Radiobutton(
                 self,
                 text=f"Level {level + 1}",
                 value=level,

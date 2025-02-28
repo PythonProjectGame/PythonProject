@@ -46,3 +46,6 @@ def email(value: str) -> bool:
         return True
     else:
         return False
+
+
+email('wefwef.wefef@werfwef.wefwef')

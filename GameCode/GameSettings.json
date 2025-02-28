@@ -15,7 +15,7 @@
     },
     "SOUND": {
         "SOUND_VOLUME": 1.0,
-        "MUSIC_VOLUME": 1.0,
+        "MUSIC_VOLUME": 0.75,
         "SFX_VOLUME": 0.75
     },
     "BG_MUSIC": [
@@ -24,7 +24,7 @@
         "sometimes-i",
         "starlight_city"
     ],
-    "SONG_CHOICE": 3,
+    "SONG_CHOICE": 2,
     "CURRENT_LEVEL": 0,
     "LEVEL_CHOICE": 0
 }
